@@ -1,4 +1,6 @@
 import { daysAgo, dayKey } from './format';
+import { createServiceClient } from './supabase/admin';
+import { isServiceConfigured } from './supabase/config';
 import { getPublicClient } from './supabase/public';
 import type {
   DailyStat,
@@ -47,7 +49,7 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
 
   const since = dayKey(daysAgo(89));
 
-  const [groupsResult, servicesResult, monitorsResult, dailyResult, openResult, recentResult, maintenanceResult, runResult] =
+  const [groupsResult, servicesResult, anonMonitorsResult, dailyResult, openResult, recentResult, maintenanceResult, runResult] =
     await Promise.all([
       client.from('service_groups').select('*').order('sort_order', { ascending: true }),
       client.from('services').select('*').eq('is_public', true).order('sort_order', { ascending: true }),
@@ -71,6 +73,14 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
         .order('scheduled_start', { ascending: true }),
       client.from('monitor_runs').select('*').order('started_at', { ascending: false }).limit(1).maybeSingle(),
     ]);
+
+  // Raw check rows are admin-only since migration 0003. If 0004 has not been
+  // applied, the public view still reads them through an invoker view and anon
+  // is denied. The view itself exposes only safe columns, so retry server-side.
+  const monitorsResult =
+    anonMonitorsResult.error && isServiceConfigured
+      ? await createServiceClient().from('monitor_status').select('*')
+      : anonMonitorsResult;
 
   const firstError =
     groupsResult.error ||
