@@ -124,6 +124,39 @@ error exits non-zero so it shows up in the Actions history.
 GitHub Actions cron is best-effort; runs can be delayed. The public page uses `max(3 × interval, 15 min)` as
 the staleness window and shows **Unknown** once evidence is late.
 
+### Supabase pg_cron fallback
+
+GitHub's scheduler can be unreliable for new repositories. The same runner is exposed at
+`POST /api/checks/run`, authenticated with the service-role key, so Supabase can drive the five-minute
+cadence instead:
+
+1. Store the service-role key in **Supabase Vault** as `status_service_key`.
+2. Enable `pg_cron` and `pg_net` in **Database → Extensions**.
+3. Run this once in the SQL editor (replace the URL with the deployment):
+
+```sql
+select cron.schedule(
+  'fasthand-status-checks',
+  '*/5 * * * *',
+  $$
+  select net.http_post(
+    url := 'https://status-page-wheat-nine.vercel.app/api/checks/run',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (
+        select decrypted_secret from vault.decrypted_secrets where name = 'status_service_key'
+      )
+    ),
+    body := '{}'::jsonb,
+    timeout_milliseconds := 30000
+  );
+  $$
+);
+```
+
+Remove it with `select cron.unschedule('fasthand-status-checks');`. Runs written this way have
+`source = pg-cron`.
+
 ---
 
 ## 4. Adding monitors (the rule that keeps the page honest)
