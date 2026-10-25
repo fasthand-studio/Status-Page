@@ -35,7 +35,7 @@ export default async function AdminLoginPage({
       <div className="mx-auto grid min-h-screen w-full max-w-6xl lg:grid-cols-[1.05fr_0.95fr]">
         <section className="flex flex-col justify-between px-5 py-8 sm:px-8 lg:py-10">
           <div>
-            <Brand label="Ops" markClassName="h-10 w-10" />
+            <Brand label="Ops" />
             <h1 className="mt-8 max-w-md text-[34px] font-semibold leading-[1.08] tracking-[-0.03em]">
               The desk behind the status page.
             </h1>

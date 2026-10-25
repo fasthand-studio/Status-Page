@@ -19,7 +19,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className="admin-shell min-h-screen bg-paper text-ink">
       <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
         <aside className="flex shrink-0 flex-col gap-5 border-b border-line px-4 py-4 lg:w-56 lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
-          <Brand label="Ops" className="text-ink" markClassName="h-8 w-8" />
+          <Brand label="Ops" className="text-ink" />
 
           <AdminNav />
 
