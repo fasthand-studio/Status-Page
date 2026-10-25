@@ -19,13 +19,9 @@ export interface CheckOutcome {
 const MAX_BODY_BYTES = 64 * 1024;
 const EXCERPT_LENGTH = 280;
 
-// Data-center endpoints sit behind Cloudflare, which challenges non-browser
-// clients from CI IP ranges. Send a normal browser request instead.
 const REQUEST_HEADERS = {
-  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'accept-language': 'en-US,en;q=0.9',
-  'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  accept: 'text/plain,text/html;q=0.9,*/*;q=0.8',
+  'user-agent': 'FastHand-Status-Monitor/1.0 (+https://status.fasthandstudio.asia)',
 };
 
 function normalizeText(value: string): string {
