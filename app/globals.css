@@ -1,0 +1,349 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0a0e0c;
+  --color-ink-soft: #131a16;
+  --color-ink-line: #25312a;
+  --color-paper: #f3f1e9;
+  --color-surface: #fbfaf4;
+  --color-line: #d8d4c7;
+  --color-muted: #65695f;
+  --color-lime: #c9f45c;
+  --color-lime-deep: #7fa61f;
+  --color-ok: #127a4b;
+  --color-ok-soft: #dfece2;
+  --color-warn: #8f5805;
+  --color-warn-soft: #f3e6cc;
+  --color-bad: #b23527;
+  --color-bad-soft: #f4ddd7;
+  --color-info: #3e50b4;
+  --color-info-soft: #e2e5f6;
+
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: var(--font-sans);
+
+  --radius-card: 22px;
+  --radius-panel: 28px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  .admin-shell :focus-visible {
+    outline-color: var(--color-lime-deep);
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* One curvature language: explicit radius, continuous superellipse corner. */
+  .fh-squircle,
+  .fh-btn,
+  .fh-btn-lg,
+  .fh-pill,
+  .fh-field,
+  .fh-field-area,
+  .fh-card,
+  .fh-panel {
+    corner-shape: superellipse(1.5);
+  }
+
+  .fh-btn,
+  .fh-btn-lg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    height: 32px;
+    padding-inline: 12px;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      opacity 0.12s ease,
+      background-color 0.12s ease,
+      color 0.12s ease,
+      border-color 0.12s ease;
+  }
+
+  .fh-btn:active,
+  .fh-btn-lg:active {
+    opacity: 0.82;
+  }
+
+  .fh-btn-lg {
+    height: 44px;
+    padding-inline: 18px;
+    border-radius: 22px;
+  }
+
+  .fh-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 24px;
+    padding-inline: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .fh-pill-lg {
+    height: 32px;
+    border-radius: 16px;
+    padding-inline: 12px;
+    font-size: 17px;
+  }
+
+  .fh-field {
+    height: 44px;
+    border-radius: 22px;
+  }
+
+  .fh-field-area {
+    border-radius: 16px;
+  }
+
+  .fh-card {
+    border-radius: 22px;
+  }
+
+  .fh-panel {
+    border-radius: 28px;
+  }
+
+  .fh-r-sm {
+    border-radius: 16px;
+    corner-shape: superellipse(1.5);
+  }
+
+  .fh-r-xs {
+    border-radius: 10px;
+    corner-shape: superellipse(1.5);
+  }
+
+  /* Capsule surfaces: 16px is half of the 32px control height and is
+     clamped to half the rendered height on shorter badges. */
+  .fh-round {
+    border-radius: 16px;
+    corner-shape: superellipse(1.5);
+  }
+
+  .fh-bar {
+    border-radius: 2px;
+    corner-shape: superellipse(1.5);
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.prose-fh {
+  font-size: 17px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--color-ink) 90%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.prose-fh > * + * {
+  margin-top: 0.85em;
+}
+
+.prose-fh h1,
+.prose-fh h2,
+.prose-fh h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin-top: 1.3em;
+}
+
+.prose-fh h1 {
+  font-size: 1.25rem;
+}
+
+.prose-fh h2 {
+  font-size: 1.1rem;
+}
+
+.prose-fh h3 {
+  font-size: 1rem;
+}
+
+.prose-fh strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.prose-fh a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-lime-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.prose-fh ul,
+.prose-fh ol {
+  padding-left: 1.25rem;
+}
+
+.prose-fh ul {
+  list-style: disc;
+}
+
+.prose-fh ol {
+  list-style: decimal;
+}
+
+.prose-fh li + li {
+  margin-top: 0.3em;
+}
+
+.prose-fh li::marker {
+  color: var(--color-muted);
+}
+
+.prose-fh code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: rgba(10, 14, 12, 0.06);
+  border-radius: 6px;
+  padding: 0.15em 0.4em;
+}
+
+.prose-fh pre {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-radius: 16px;
+  corner-shape: superellipse(1.5);
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+.prose-fh pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.prose-fh blockquote {
+  border-left: 3px solid var(--color-lime-deep);
+  padding-left: 1rem;
+  color: var(--color-muted);
+}
+
+.prose-fh hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin: 1.4em 0;
+}
+
+.prose-fh table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.prose-fh th,
+.prose-fh td {
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.prose-fh th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.prose-fh-invert {
+  color: rgba(243, 241, 233, 0.85);
+}
+
+.prose-fh-invert strong,
+.prose-fh-invert a {
+  color: var(--color-paper);
+}
+
+.prose-fh-invert code {
+  background: rgba(243, 241, 233, 0.1);
+  color: var(--color-paper);
+}
+
+.prose-fh-invert pre {
+  background: rgba(243, 241, 233, 0.06);
+  border: 1px solid rgba(243, 241, 233, 0.1);
+}
+
+.prose-fh-invert blockquote {
+  border-left-color: var(--color-lime);
+  color: rgba(243, 241, 233, 0.6);
+}
+
+.prose-fh-invert li::marker {
+  color: rgba(243, 241, 233, 0.45);
+}
+
+.prose-fh-invert hr,
+.prose-fh-invert th,
+.prose-fh-invert td {
+  border-color: rgba(243, 241, 233, 0.12);
+}
+
+.prose-fh-invert th {
+  color: rgba(243, 241, 233, 0.5);
+}
