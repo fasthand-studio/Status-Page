@@ -23,7 +23,7 @@ async function main() {
 
   if (runError || !run) {
     throw new Error(
-      `Could not start a monitor run: ${runError?.message ?? 'no row returned'}. Check that migrations 0001–0003 have been applied and the service-role key is correct.`,
+      `Could not start a monitor run: ${runError?.message ?? 'no row returned'}. Check that migrations 0001–0004 have been applied and the service-role key is correct.`,
     );
   }
 

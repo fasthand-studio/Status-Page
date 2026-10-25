@@ -46,6 +46,8 @@ You only need a **cloud Supabase project**. No local stack, CLI daemon, or Docke
       the one verified monitor.
    3. [`supabase/migrations/0003_secure_checks.sql`](supabase/migrations/0003_secure_checks.sql) — makes raw
       check rows admin-only and moves public uptime onto aggregate views.
+   4. [`supabase/migrations/0004_public_monitor_status.sql`](supabase/migrations/0004_public_monitor_status.sql) —
+      keeps the public monitor-status view readable after raw checks became admin-only.
 5. **Create the admin user** — Authentication → Users → **Add user** → email + password. If you create it
    with email confirmation, confirm it (or use “Auto Confirm User”).
 6. **Grant the allowlist row** — with the service-role key in `.env.local`:
@@ -167,7 +169,10 @@ render as **No check**. Add them only when their health endpoints exist and have
 3. Add the environment variables from step 1 for Production, Preview, and Development as appropriate.
 4. Deploy, then set the Supabase **Site URL** to the final domain.
 5. Add the same repository secrets to GitHub so the scheduled workflow can write checks.
-6. Push is not automatically a deployment unless the Vercel project is connected to this repository; check
+6. Deployment Protection: if **Vercel Authentication** is enabled, `*.vercel.app` URLs return a login page.
+   Either turn it off for this project or attach the real status domain (custom domains are excluded by the
+   `all_except_custom_domains` setting).
+7. Push is not automatically a deployment unless the Vercel project is connected to this repository; check
    the Vercel dashboard after the first push.
 
 No Docker, no `supabase start`, no local Postgres.
