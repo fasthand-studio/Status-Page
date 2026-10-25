@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAdminContext } from '@/lib/auth';
 import { loadAdminServices } from '@/lib/admin-data';
+import { deleteServiceAction } from '@/app/admin/actions';
 import {
   AdminPageHeader,
   adminCardClass,
@@ -10,13 +11,19 @@ import {
   Notice,
   primaryButtonClass,
 } from '@/components/admin/ui';
+import { DeleteButton } from '@/components/admin/delete-button';
 import { MonitorState } from '@/components/admin/monitor-state';
 import { PlusIcon } from '@/components/icons';
 
 export const metadata: Metadata = { title: 'Services — FastHand Ops' };
 
-export default async function AdminServicesPage() {
+export default async function AdminServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deleted?: string }>;
+}) {
   const context = await requireAdminContext();
+  const query = await searchParams;
 
   let data;
   try {
@@ -45,6 +52,8 @@ export default async function AdminServicesPage() {
           </Link>
         }
       />
+
+      {query.deleted ? <Notice tone="ok">Service deleted.</Notice> : null}
 
       <Notice tone="info">
         A service is only shown as operational when an attached monitor has a fresh passing check. Services without a
@@ -95,10 +104,17 @@ export default async function AdminServicesPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 font-sans text-[15px] text-muted">{service.sort_order}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/admin/services/${service.id}`} className={linkClass}>
-                      Edit
-                    </Link>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                      <Link href={`/admin/services/${service.id}`} className={linkClass}>
+                        Edit
+                      </Link>
+                      <DeleteButton
+                        action={deleteServiceAction}
+                        fields={{ service_id: service.id }}
+                        description="Delete this service and its incident and maintenance links? Its monitor and checks stay."
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

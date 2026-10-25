@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAdminContext } from '@/lib/auth';
 import { loadAdminMonitors } from '@/lib/admin-data';
-import { toggleMonitorAction, runMonitorNowAction } from '@/app/admin/actions';
+import { toggleMonitorAction, runMonitorNowAction, deleteMonitorAction } from '@/app/admin/actions';
 import { formatRelativeTime } from '@/lib/format';
 import { isMonitorStale } from '@/lib/status';
 import {
@@ -15,13 +15,19 @@ import {
   secondaryButtonClass,
 } from '@/components/admin/ui';
 import { InlineActionButton } from '@/components/admin/inline-action-button';
+import { DeleteButton } from '@/components/admin/delete-button';
 import { MonitorState } from '@/components/admin/monitor-state';
 import { PlayIcon, PlusIcon } from '@/components/icons';
 
 export const metadata: Metadata = { title: 'Monitors — FastHand Ops' };
 
-export default async function AdminMonitorsPage() {
+export default async function AdminMonitorsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deleted?: string }>;
+}) {
   const context = await requireAdminContext();
+  const query = await searchParams;
 
   let data;
   try {
@@ -50,6 +56,8 @@ export default async function AdminMonitorsPage() {
           </Link>
         }
       />
+
+      {query.deleted ? <Notice tone="ok">Monitor deleted.</Notice> : null}
 
       <Notice tone={enabled.length === 0 ? 'warn' : 'info'}>
         {enabled.length === 0
@@ -134,6 +142,12 @@ export default async function AdminMonitorsPage() {
                     <PlayIcon className="h-3 w-3" />
                     Check history
                   </Link>
+                  <DeleteButton
+                    action={deleteMonitorAction}
+                    fields={{ monitor_id: monitor.id }}
+                    description="Delete this monitor and all stored check results? Attached services become No check."
+                    className="ml-auto"
+                  />
                 </div>
               </article>
             );

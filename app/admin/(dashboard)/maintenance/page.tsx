@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAdminContext } from '@/lib/auth';
 import { loadAdminMaintenance } from '@/lib/admin-data';
+import { deleteMaintenanceAction } from '@/app/admin/actions';
 import { formatWindow } from '@/lib/format';
 import {
   AdminMaintenanceBadge,
@@ -12,12 +13,18 @@ import {
   Notice,
   primaryButtonClass,
 } from '@/components/admin/ui';
+import { DeleteButton } from '@/components/admin/delete-button';
 import { PlusIcon } from '@/components/icons';
 
 export const metadata: Metadata = { title: 'Maintenance — FastHand Ops' };
 
-export default async function AdminMaintenancePage() {
+export default async function AdminMaintenancePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deleted?: string }>;
+}) {
   const context = await requireAdminContext();
+  const query = await searchParams;
 
   let data;
   try {
@@ -52,6 +59,8 @@ export default async function AdminMaintenancePage() {
         }
       />
 
+      {query.deleted ? <Notice tone="ok">Maintenance window deleted.</Notice> : null}
+
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="font-sans text-[18px] font-semibold">Upcoming & active</h2>
@@ -62,18 +71,24 @@ export default async function AdminMaintenancePage() {
         ) : (
           <div className="space-y-2">
             {upcoming.map((window) => (
-              <Link
-                key={window.id}
-                href={`/admin/maintenance/${window.id}`}
-                className={`${adminCardClass} block p-4 transition hover:border-ink/25`}
-              >
+              <article key={window.id} className={`${adminCardClass} p-4`}>
                 <div className="flex flex-wrap items-center gap-2">
                   <AdminMaintenanceBadge status={window.status} />
                   <span className="text-[15px] text-muted">{window.maintenance_services.length} services</span>
                 </div>
                 <p className="mt-2 font-medium text-ink">{window.title}</p>
                 <p className="mt-1 text-[15px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</p>
-              </Link>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
+                  <Link href={`/admin/maintenance/${window.id}`} className={`${linkClass} text-[15px]`}>
+                    Open window
+                  </Link>
+                  <DeleteButton
+                    action={deleteMaintenanceAction}
+                    fields={{ maintenance_id: window.id }}
+                    description="Delete this maintenance window and its service links?"
+                  />
+                </div>
+              </article>
             ))}
           </div>
         )}
@@ -113,10 +128,17 @@ export default async function AdminMaintenancePage() {
                     <td className="px-4 py-3 font-sans text-[15px] text-muted">
                       {window.maintenance_services.length}
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link href={`/admin/maintenance/${window.id}`} className={linkClass}>
-                        Open
-                      </Link>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center justify-end gap-3">
+                        <Link href={`/admin/maintenance/${window.id}`} className={linkClass}>
+                          Open
+                        </Link>
+                        <DeleteButton
+                          action={deleteMaintenanceAction}
+                          fields={{ maintenance_id: window.id }}
+                          description="Delete this maintenance window and its service links?"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

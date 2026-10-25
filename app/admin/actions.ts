@@ -236,6 +236,26 @@ export async function postIncidentUpdateAction(_state: ActionState, formData: Fo
   redirect(`/admin/incidents/${incidentId}?posted=1`);
 }
 
+export async function deleteIncidentAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const incidentId = formText(formData, 'incident_id');
+  if (!isUuid(incidentId)) return failed('That incident link is not valid.');
+
+  const { data, error } = await auth.session.supabase
+    .from('incidents')
+    .delete()
+    .eq('id', incidentId)
+    .select('id');
+
+  if (error) return failed(dbMessage(error, 'Could not delete the incident.'));
+  if (!data || data.length === 0) return failed('That incident no longer exists.');
+
+  revalidateIncident(incidentId);
+  redirect('/admin/incidents?deleted=1');
+}
+
 // ---------------------------------------------------------------------------
 // Services
 // ---------------------------------------------------------------------------
@@ -314,6 +334,28 @@ export async function updateServiceAction(_state: ActionState, formData: FormDat
   revalidatePath('/admin/services');
   revalidatePath(`/admin/services/${serviceId}`);
   redirect(`/admin/services/${serviceId}?saved=1`);
+}
+
+export async function deleteServiceAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const serviceId = formText(formData, 'service_id');
+  if (!isUuid(serviceId)) return failed('That service link is not valid.');
+
+  const { data, error } = await auth.session.supabase
+    .from('services')
+    .delete()
+    .eq('id', serviceId)
+    .select('id');
+
+  if (error) return failed(dbMessage(error, 'Could not delete the service.'));
+  if (!data || data.length === 0) return failed('That service no longer exists.');
+
+  revalidateStatusPages();
+  revalidatePath('/admin/services');
+  revalidatePath(`/admin/services/${serviceId}`);
+  redirect('/admin/services?deleted=1');
 }
 
 // ---------------------------------------------------------------------------
@@ -463,6 +505,28 @@ export async function runMonitorNowAction(_state: ActionState, formData: FormDat
   redirect(`/admin/monitors/${monitorId}?ran=${outcomeOk ? 'ok' : 'fail'}`);
 }
 
+export async function deleteMonitorAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const monitorId = formText(formData, 'monitor_id');
+  if (!isUuid(monitorId)) return failed('That monitor link is not valid.');
+
+  const { data, error } = await auth.session.supabase
+    .from('monitors')
+    .delete()
+    .eq('id', monitorId)
+    .select('id');
+
+  if (error) return failed(dbMessage(error, 'Could not delete the monitor.'));
+  if (!data || data.length === 0) return failed('That monitor no longer exists.');
+
+  revalidateStatusPages();
+  revalidatePath('/admin/monitors');
+  revalidatePath(`/admin/monitors/${monitorId}`);
+  redirect('/admin/monitors?deleted=1');
+}
+
 // ---------------------------------------------------------------------------
 // Maintenance
 // ---------------------------------------------------------------------------
@@ -566,6 +630,28 @@ export async function updateMaintenanceAction(_state: ActionState, formData: For
   revalidatePath('/admin/maintenance');
   revalidatePath(`/admin/maintenance/${maintenanceId}`);
   redirect(`/admin/maintenance/${maintenanceId}?saved=1`);
+}
+
+export async function deleteMaintenanceAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const maintenanceId = formText(formData, 'maintenance_id');
+  if (!isUuid(maintenanceId)) return failed('That maintenance link is not valid.');
+
+  const { data, error } = await auth.session.supabase
+    .from('maintenance_windows')
+    .delete()
+    .eq('id', maintenanceId)
+    .select('id');
+
+  if (error) return failed(dbMessage(error, 'Could not delete the maintenance window.'));
+  if (!data || data.length === 0) return failed('That maintenance window no longer exists.');
+
+  revalidateStatusPages();
+  revalidatePath('/admin/maintenance');
+  revalidatePath(`/admin/maintenance/${maintenanceId}`);
+  redirect('/admin/maintenance?deleted=1');
 }
 
 // ---------------------------------------------------------------------------

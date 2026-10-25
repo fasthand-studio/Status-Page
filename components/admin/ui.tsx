@@ -28,6 +28,12 @@ export const secondaryButtonClass =
 export const smallButtonClass =
   'fh-btn border border-line bg-surface px-3 text-ink transition-colors hover:border-ink/30 hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50';
 
+export const dangerButtonClass =
+  'fh-btn border border-bad/40 bg-surface px-3 text-bad transition-colors hover:bg-bad-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bad disabled:cursor-not-allowed disabled:opacity-50';
+
+export const dangerSolidButtonClass =
+  'fh-btn bg-bad px-3 text-white transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bad disabled:cursor-not-allowed disabled:opacity-50';
+
 export const linkClass = 'text-ink underline decoration-primary-deep decoration-2 underline-offset-4 hover:decoration-ink';
 
 export function Field({
