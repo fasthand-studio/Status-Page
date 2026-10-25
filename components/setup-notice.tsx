@@ -13,8 +13,9 @@ export function SetupNotice() {
           <span className="text-[13px] font-semibold text-muted">1</span>
           <p className="mt-1">
             Create a Supabase project, then run{' '}
-            <code className="fh-r-xs bg-ink/5 px-1 py-0.5 font-sans text-[15px]">0001_init.sql</code> and{' '}
-            <code className="fh-r-xs bg-ink/5 px-1 py-0.5 font-sans text-[15px]">0002_seed.sql</code> from{' '}
+            <code className="fh-r-xs bg-ink/5 px-1 py-0.5 font-sans text-[15px]">0001_init.sql</code> through{' '}
+            <code className="fh-r-xs bg-ink/5 px-1 py-0.5 font-sans text-[15px]">0004_public_monitor_status.sql</code>{' '}
+            from{' '}
             <code className="fh-r-xs bg-ink/5 px-1 py-0.5 font-sans text-[15px]">supabase/migrations</code>.
           </p>
         </li>
@@ -46,7 +47,7 @@ export function SetupNotice() {
         href="https://github.com/fasthand-studio/Status-Page#readme"
         target="_blank"
         rel="noreferrer noopener"
-        className="mt-5 inline-flex items-center gap-1.5 text-[15px] underline decoration-lime-deep decoration-2 underline-offset-4 hover:decoration-ink"
+        className="mt-5 inline-flex items-center gap-1.5 text-[15px] underline decoration-primary-deep decoration-2 underline-offset-4 hover:decoration-ink"
       >
         Full setup guide
         <ArrowUpRightIcon className="h-4 w-4" />
