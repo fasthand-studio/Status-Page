@@ -174,7 +174,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href="/history"
-                className="text-[15px] text-muted underline decoration-lime-deep decoration-2 underline-offset-4 hover:text-ink"
+                className="text-[15px] text-muted underline decoration-primary-deep decoration-2 underline-offset-4 hover:text-ink"
               >
                 Archive
               </Link>

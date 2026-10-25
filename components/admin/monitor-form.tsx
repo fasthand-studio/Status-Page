@@ -188,7 +188,7 @@ export function MonitorForm({
             type="checkbox"
             name="enabled"
             defaultChecked={monitor?.enabled ?? true}
-            className="h-4 w-4 accent-lime"
+            className="h-4 w-4 accent-primary"
           />
           Run this monitor on the scheduled workflow
         </label>

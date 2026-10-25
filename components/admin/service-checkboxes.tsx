@@ -92,7 +92,7 @@ export function ServiceCheckboxes({
                     key={service.id}
                     className={cn(
                       'flex cursor-pointer items-center gap-2.5 fh-r-xs px-2 py-1.5 text-[17px] transition',
-                      checked ? 'bg-lime/10 text-ink' : 'text-muted hover:bg-ink/5',
+                      checked ? 'bg-primary/10 text-ink' : 'text-muted hover:bg-ink/5',
                     )}
                   >
                     <input
@@ -101,7 +101,7 @@ export function ServiceCheckboxes({
                       value={service.id}
                       checked={checked}
                       onChange={() => toggle(service.id)}
-                      className="h-4 w-4 shrink-0 accent-lime"
+                      className="h-4 w-4 shrink-0 accent-primary"
                     />
                     <span className="truncate">{service.name}</span>
                   </label>

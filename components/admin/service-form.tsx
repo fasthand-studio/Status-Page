@@ -126,7 +126,7 @@ export function ServiceForm({
             type="checkbox"
             name="is_public"
             defaultChecked={service?.is_public ?? true}
-            className="h-4 w-4 accent-lime"
+            className="h-4 w-4 accent-primary"
           />
           Show this service on the public status page
         </label>

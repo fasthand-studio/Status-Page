@@ -50,7 +50,7 @@ export function IncidentCard({
       </div>
 
       <h3 className="mt-3 font-sans text-[19px] font-semibold leading-tight tracking-[-0.03em]">
-        <Link href={`/incidents/${incident.id}`} className="hover:underline decoration-lime-deep decoration-2 underline-offset-4">
+        <Link href={`/incidents/${incident.id}`} className="hover:underline decoration-primary-deep decoration-2 underline-offset-4">
           {incident.title}
         </Link>
       </h3>
@@ -86,7 +86,7 @@ export function IncidentCard({
         </span>
         <Link
           href={`/incidents/${incident.id}`}
-          className="font-sans text-[13px] text-ink underline decoration-lime-deep decoration-2 underline-offset-4 hover:opacity-70"
+          className="font-sans text-[13px] text-ink underline decoration-primary-deep decoration-2 underline-offset-4 hover:opacity-70"
         >
           Read updates →
         </Link>
