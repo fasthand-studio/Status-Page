@@ -2,8 +2,7 @@ name: Status checks
 
 on:
   schedule:
-    # GitHub Actions cron is UTC. Off-peak minutes are less likely to be delayed.
-    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 concurrency:

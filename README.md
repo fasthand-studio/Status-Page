@@ -100,7 +100,7 @@ inventing uptime, and `/admin/login` lists the missing variables.
 
 ## 3. Checks and automation
 
-`npm run checks` (and `.github/workflows/checks.yml`, every five minutes) does this:
+`npm run checks` (and `.github/workflows/status-checks.yml`, every five minutes) does this:
 
 1. Inserts a `monitor_runs` row (`source = github-actions`).
 2. Loads every **enabled** monitor.
