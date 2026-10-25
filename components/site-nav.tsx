@@ -29,7 +29,7 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
             aria-current={active ? 'page' : undefined}
             className={cn(
               'fh-pill-lg relative whitespace-nowrap transition-colors',
-              active ? 'bg-lime font-semibold text-ink' : 'text-muted hover:bg-ink/[0.05] hover:text-ink',
+              active ? 'bg-primary font-semibold text-white' : 'text-muted hover:bg-ink/[0.05] hover:text-ink',
             )}
           >
             {item.label}

@@ -8,16 +8,16 @@
   --color-surface: #fbfaf4;
   --color-line: #d8d4c7;
   --color-muted: #65695f;
-  --color-lime: #c9f45c;
-  --color-lime-deep: #7fa61f;
+  --color-primary: #5200fe;
+  --color-primary-deep: #3a00b8;
   --color-ok: #127a4b;
   --color-ok-soft: #dfece2;
   --color-warn: #8f5805;
   --color-warn-soft: #f3e6cc;
   --color-bad: #b23527;
   --color-bad-soft: #f4ddd7;
-  --color-info: #3e50b4;
-  --color-info-soft: #e2e5f6;
+  --color-info: #46506e;
+  --color-info-soft: #e5e6ea;
 
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
@@ -45,8 +45,8 @@
   }
 
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-ink);
+    background: var(--color-primary);
+    color: #ffffff;
   }
 
   :focus-visible {
@@ -55,7 +55,7 @@
   }
 
   .admin-shell :focus-visible {
-    outline-color: var(--color-lime-deep);
+    outline-color: var(--color-primary-deep);
   }
 
   input,
@@ -229,7 +229,7 @@
 
 .prose-fh a {
   text-decoration: underline;
-  text-decoration-color: var(--color-lime-deep);
+  text-decoration-color: var(--color-primary-deep);
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
@@ -280,7 +280,7 @@
 }
 
 .prose-fh blockquote {
-  border-left: 3px solid var(--color-lime-deep);
+  border-left: 3px solid var(--color-primary-deep);
   padding-left: 1rem;
   color: var(--color-muted);
 }
@@ -330,7 +330,7 @@
 }
 
 .prose-fh-invert blockquote {
-  border-left-color: var(--color-lime);
+  border-left-color: var(--color-primary);
   color: rgba(243, 241, 233, 0.6);
 }
 

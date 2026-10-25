@@ -20,7 +20,7 @@ export const adminHintClass = 'mt-1.5 text-[15px] leading-relaxed text-muted';
 export const adminCardClass = 'fh-card border border-line bg-surface';
 
 export const primaryButtonClass =
-  'fh-btn-lg bg-lime text-ink transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50';
+  'fh-btn-lg bg-primary text-white transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50';
 
 export const secondaryButtonClass =
   'fh-btn border border-line bg-surface text-ink transition-colors hover:border-ink/30 hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50';
@@ -28,7 +28,7 @@ export const secondaryButtonClass =
 export const smallButtonClass =
   'fh-btn border border-line bg-surface px-3 text-ink transition-colors hover:border-ink/30 hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50';
 
-export const linkClass = 'text-ink underline decoration-lime-deep decoration-2 underline-offset-4 hover:decoration-ink';
+export const linkClass = 'text-ink underline decoration-primary-deep decoration-2 underline-offset-4 hover:decoration-ink';
 
 export function Field({
   label,

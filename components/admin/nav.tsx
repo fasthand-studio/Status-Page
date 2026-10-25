@@ -28,7 +28,7 @@ export function AdminNav() {
             className={cn(
               'fh-pill-lg shrink-0 justify-start px-3 transition-colors',
               active
-                ? 'bg-lime font-semibold text-ink'
+                ? 'bg-primary font-semibold text-white'
                 : 'font-medium text-muted hover:bg-ink/5 hover:text-ink',
             )}
           >

@@ -56,7 +56,7 @@ export function MarkdownField({
               onClick={() => setTab(mode)}
               className={cn(
                 'fh-pill-lg px-3 capitalize transition-colors',
-                tab === mode ? 'bg-lime font-semibold text-ink' : 'text-muted hover:text-ink',
+                tab === mode ? 'bg-primary font-semibold text-white' : 'text-muted hover:text-ink',
               )}
             >
               {mode}
