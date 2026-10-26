@@ -3,10 +3,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { formatRelativeTime, formatUptime } from '@/lib/format';
-import type { ServiceHealth } from '@/lib/status';
+import { HEALTH_LABEL, type ServiceHealth } from '@/lib/status';
 import type { DailyBar, HealthState, UptimeWindow } from '@/lib/types';
 import { EmptyState } from './empty-state';
-import { ChevronDownIcon, SearchIcon } from './icons';
+import {
+  AlertIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  CrossIcon,
+  MinusIcon,
+  SearchIcon,
+  WrenchIcon,
+} from './icons';
 import { ServiceIcon } from './service-icon';
 import { StatusPill } from './status-pill';
 import { UptimeBars } from './uptime-bars';
@@ -44,6 +52,15 @@ function windows(service: ExplorerService) {
     { label: '90d', window: service.uptime90 },
   ];
 }
+
+const STATE_CELLS: { state: HealthState; icon: typeof CheckIcon; tone: string }[] = [
+  { state: 'operational', icon: CheckIcon, tone: 'text-ok' },
+  { state: 'degraded', icon: AlertIcon, tone: 'text-warn' },
+  { state: 'outage', icon: CrossIcon, tone: 'text-bad' },
+  { state: 'maintenance', icon: WrenchIcon, tone: 'text-info' },
+  { state: 'unknown', icon: MinusIcon, tone: 'text-muted' },
+  { state: 'unmonitored', icon: MinusIcon, tone: 'text-muted' },
+];
 
 export function ServicesExplorer({
   groups,
@@ -95,6 +112,16 @@ export function ServicesExplorer({
       .filter((group) => group.services.length > 0);
   }, [groups, normalizedQuery]);
 
+  const stateCounts = useMemo(() => {
+    const tally = new Map<HealthState, number>();
+    for (const group of groups) {
+      for (const service of group.services) {
+        tally.set(service.health.state, (tally.get(service.health.state) ?? 0) + 1);
+      }
+    }
+    return tally;
+  }, [groups]);
+
   const matchCount = filteredGroups.reduce((total, group) => total + group.services.length, 0);
 
   const toggleGroup = (id: string) => {
@@ -111,7 +138,21 @@ export function ServicesExplorer({
 
   return (
     <div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        {STATE_CELLS.map(({ state, icon: Icon, tone }) => (
+          <div key={state} className="fh-card border border-line bg-surface px-2.5 py-2">
+            <span className="flex items-center gap-1 text-[14px] text-muted">
+              <Icon className={cn('h-3 w-3 shrink-0', tone)} strokeWidth={2.4} aria-hidden="true" />
+              {HEALTH_LABEL[state]}
+            </span>
+            <span className={cn('fh-num mt-0.5 block text-[24px] font-medium leading-tight', tone)}>
+              {stateCounts.get(state) ?? 0}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
           <input
@@ -180,6 +221,12 @@ export function ServicesExplorer({
                   aria-expanded={isOpen}
                   className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left transition-colors hover:bg-surface-soft"
                 >
+                  <ChevronDownIcon
+                    className={cn(
+                      'h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200',
+                      !isOpen && '-rotate-90',
+                    )}
+                  />
                   <h2 className="text-[17px] font-semibold">{group.name}</h2>
                   <StatusPill state={group.worst} />
                   {group.description && (
@@ -187,15 +234,10 @@ export function ServicesExplorer({
                       {group.description}
                     </span>
                   )}
-                  <span className="ml-auto hidden shrink-0 text-[14px] text-muted sm:inline">
-                    {group.monitoredCount}/{group.services.length} checked
+                  <span className="ml-auto shrink-0 text-[14px] text-muted">
+                    {group.services.length} service{group.services.length === 1 ? '' : 's'}
+                    <span className="hidden sm:inline"> · {group.monitoredCount} checked</span>
                   </span>
-                  <ChevronDownIcon
-                    className={cn(
-                      'ml-1 h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200',
-                      isOpen && 'rotate-180',
-                    )}
-                  />
                 </button>
 
                 {isOpen && (
@@ -206,26 +248,16 @@ export function ServicesExplorer({
                         id={`service-${service.slug}`}
                         className="group scroll-mt-24 border-b border-line last:border-b-0"
                       >
-                        <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_76px_16px] items-center gap-x-2.5 gap-y-2.5 px-3 py-2.5 transition-colors hover:bg-surface-soft sm:px-3.5 sm:py-3 [&::-webkit-details-marker]:hidden">
+                        <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_auto_auto_16px] items-center gap-x-2.5 gap-y-2.5 px-3 py-2.5 transition-colors hover:bg-surface-soft sm:px-3.5 sm:py-3 [&::-webkit-details-marker]:hidden">
                           <ServiceIcon slug={service.slug} />
-                          <div className="min-w-0">
-                            <span className="block truncate text-[17px] font-medium">{service.name}</span>
-                            <div className="mt-1">
-                              <StatusPill state={service.health.state} />
-                            </div>
-                            <span className="mt-1 block truncate text-[14px] text-muted">
-                              {service.lastCheckAt
-                                ? `Checked ${formatRelativeTime(service.lastCheckAt, now)}`
-                                : 'No checks recorded'}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <span className="fh-num block text-[15px] text-ink/85">
-                              {formatUptime(service.uptime90.percent)}
-                            </span>
-                            <span className="block text-[14px] text-muted">90d</span>
-                          </div>
-                          <ChevronDownIcon className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-180" />
+                          <span className="block min-w-0 truncate text-[17px] font-medium">{service.name}</span>
+                          <span className="hidden shrink-0 text-[14px] text-muted sm:inline">
+                            {service.lastCheckAt
+                              ? `Checked ${formatRelativeTime(service.lastCheckAt, now)}`
+                              : 'No checks recorded'}
+                          </span>
+                          <StatusPill state={service.health.state} />
+                          <ChevronDownIcon className="h-3.5 w-3.5 -rotate-90 text-muted transition-transform group-open:rotate-0" />
                           <div className="col-span-full" onClick={(event) => event.preventDefault()}>
                             <UptimeBars bars={service.bars} label={service.name} />
                           </div>

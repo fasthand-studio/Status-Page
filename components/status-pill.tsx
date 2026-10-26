@@ -36,7 +36,6 @@ export function StatusPill({
   state: HealthState | 'setup';
   label?: string;
   className?: string;
-  size?: 'sm' | 'md';
 }) {
   const Icon = ICONS[state];
 
