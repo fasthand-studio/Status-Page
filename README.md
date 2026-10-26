@@ -5,7 +5,8 @@ A public status page and an internal operations desk for FastHand, shaped like
 says what the stored checks actually prove.**
 
 - Live site: **https://status.fasthandstudio.asia**
-- Ops desk: **https://status.fasthandstudio.asia/admin** (allowlisted admins only)
+- Ops desk: **`/admin` on whatever domain you deploy to** — the examples below write it as
+  **https://example.com/admin**, and only people on the `admin_users` allowlist may use it
 - Repository: `fasthand-studio/Status-Page` · deploys from `main`
 - Day-to-day incident steps live in [docs/RUNBOOK.md](docs/RUNBOOK.md)
 
@@ -517,8 +518,9 @@ curl -s -o /dev/null -w '%{http_code}\n' https://status.fasthandstudio.asia/
 curl -s -o /dev/null -w '%{http_code}\n' -X POST https://status.fasthandstudio.asia/api/checks/run
 curl -s -o /dev/null -w '%{http_code}\n' -X POST https://status.fasthandstudio.asia/api/incident-draft
 
-# the ops desk requires a session
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://status.fasthandstudio.asia/admin
+# the ops desk requires a session — substitute your own site URL for example.com;
+# an anonymous request must redirect, never render
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://example.com/admin
 
 # the scheduler is alive: newest run is pg-cron and within the cadence
 # (run in the Supabase SQL editor)
