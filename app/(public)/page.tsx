@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { DataError } from '@/components/data-error';
+import { ogImage } from '@/lib/seo';
 import { IncidentCard } from '@/components/incident-card';
 import { IncidentRow } from '@/components/incident-row';
 import { MaintenanceRow } from '@/components/maintenance-row';
@@ -10,6 +12,28 @@ import { getStatusSnapshot } from '@/lib/data';
 import { formatRelativeTime } from '@/lib/format';
 import { deriveOverallStatus } from '@/lib/status';
 import type { IncidentWithRelations, MaintenanceWithServices } from '@/lib/types';
+
+const description =
+  'Live health, measured uptime, incident history, and scheduled maintenance for every FastHand service. Uptime comes from real automated checks, never estimates.';
+
+export const metadata: Metadata = {
+  description,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'FastHand Status',
+    title: 'FastHand Status — live uptime and incident history',
+    description,
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FastHand Status — live uptime and incident history',
+    description,
+  },
+};
 
 const IMPACT_ORDER = { critical: 4, major: 3, minor: 2, none: 1 } as const;
 

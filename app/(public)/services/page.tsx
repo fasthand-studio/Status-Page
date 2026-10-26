@@ -6,6 +6,7 @@ import { ServicesExplorer, type ExplorerGroup } from '@/components/services-expl
 import { SetupNotice } from '@/components/setup-notice';
 import { UptimeLegend } from '@/components/uptime-legend';
 import { getStatusSnapshot } from '@/lib/data';
+import { ogImage } from '@/lib/seo';
 import {
   buildDailyBars,
   deriveOverallStatus,
@@ -14,9 +15,27 @@ import {
   summarizeUptime,
 } from '@/lib/status';
 
+const description =
+  'Every FastHand service, its current health, and 90 days of measured uptime.';
+
 export const metadata: Metadata = {
   title: 'Services',
-  description: 'Every FastHand service, its current health, and 90 days of measured uptime.',
+  description,
+  alternates: { canonical: '/services' },
+  openGraph: {
+    type: 'website',
+    url: '/services',
+    siteName: 'FastHand Status',
+    title: 'FastHand service health and uptime',
+    description,
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FastHand service health and uptime',
+    description,
+  },
 };
 
 export default async function ServicesPage() {

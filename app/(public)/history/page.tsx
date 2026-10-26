@@ -7,6 +7,7 @@ import { Markdown } from '@/components/markdown';
 import { PageHeader } from '@/components/page-header';
 import { SetupNotice } from '@/components/setup-notice';
 import { getHistory, getServiceDirectory } from '@/lib/data';
+import { ogImage } from '@/lib/seo';
 import {
   formatClock,
   formatDateTime,
@@ -18,9 +19,27 @@ import {
 import { maintenancePhase, MAINTENANCE_PHASE_TONE } from '@/lib/maintenance';
 import type { IncidentWithRelations, MaintenanceWithServices } from '@/lib/types';
 
+const description =
+  'The full public incident and maintenance archive for FastHand services.';
+
 export const metadata: Metadata = {
   title: 'History',
-  description: 'The full public incident and maintenance archive for FastHand services.',
+  description,
+  alternates: { canonical: '/history' },
+  openGraph: {
+    type: 'website',
+    url: '/history',
+    siteName: 'FastHand Status',
+    title: 'FastHand incident and maintenance history',
+    description,
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FastHand incident and maintenance history',
+    description,
+  },
 };
 
 type HistoryType = 'all' | 'incidents' | 'maintenance' | 'detected';

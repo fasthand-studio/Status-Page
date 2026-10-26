@@ -7,6 +7,7 @@ import { ArrowLeftIcon, LinkIcon } from '@/components/icons';
 import { ImpactBadge, IncidentStatusBadge } from '@/components/incident-status-badge';
 import { IncidentTimeline } from '@/components/incident-timeline';
 import { getIncidentDetail, getServiceDirectory } from '@/lib/data';
+import { ogImage } from '@/lib/seo';
 import { formatDateTime, formatDuration } from '@/lib/format';
 import { getPublicClient } from '@/lib/supabase/public';
 
@@ -18,8 +19,33 @@ const loadServices = cache(getServiceDirectory);
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { id } = await params;
   const { incident } = await loadIncident(id);
-  if (!incident) return { title: 'Incident not found' };
-  return { title: incident.title, description: incident.title };
+  if (!incident) {
+    return { title: 'Incident not found', robots: { index: false, follow: false } };
+  }
+
+  const description = `FastHand incident: ${incident.title} (${incident.status}${incident.resolved_at ? ', resolved' : ', ongoing'}).`;
+
+  return {
+    title: incident.title,
+    description,
+    alternates: { canonical: `/incidents/${incident.id}` },
+    openGraph: {
+      type: 'article',
+      url: `/incidents/${incident.id}`,
+      siteName: 'FastHand Status',
+      title: incident.title,
+      description,
+      locale: 'en_US',
+      publishedTime: incident.started_at,
+      modifiedTime: incident.updated_at,
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: incident.title,
+      description,
+    },
+  };
 }
 
 export default async function IncidentDetailPage({ params }: { params: Promise<Params> }) {

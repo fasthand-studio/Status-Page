@@ -6,12 +6,31 @@ import { PageHeader } from '@/components/page-header';
 import { SectionHeading } from '@/components/section-heading';
 import { SetupNotice } from '@/components/setup-notice';
 import { getMaintenanceHistory, getServiceDirectory } from '@/lib/data';
+import { ogImage } from '@/lib/seo';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import type { MaintenanceWithServices } from '@/lib/types';
 
+const description =
+  'Scheduled and completed maintenance windows for FastHand services, in UTC.';
+
 export const metadata: Metadata = {
   title: 'Maintenance',
-  description: 'Scheduled and completed maintenance windows for FastHand services, in UTC.',
+  description,
+  alternates: { canonical: '/maintenance' },
+  openGraph: {
+    type: 'website',
+    url: '/maintenance',
+    siteName: 'FastHand Status',
+    title: 'FastHand maintenance windows',
+    description,
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FastHand maintenance windows',
+    description,
+  },
 };
 
 function EmptyRow({ children }: { children: ReactNode }) {

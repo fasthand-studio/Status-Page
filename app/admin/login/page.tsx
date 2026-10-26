@@ -11,7 +11,13 @@ import { LockIcon } from '@/components/icons';
 
 export const metadata: Metadata = {
   title: 'Admin sign in',
-  robots: { index: false, follow: false },
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+  },
 };
 
 const ERROR_COPY: Record<string, string> = {

@@ -6,12 +6,31 @@ import { PageHeader } from '@/components/page-header';
 import { SectionHeading } from '@/components/section-heading';
 import { SetupNotice } from '@/components/setup-notice';
 import { getStatusSnapshot } from '@/lib/data';
+import { ogImage } from '@/lib/seo';
 import { formatMonthLabel, formatRelativeTime } from '@/lib/format';
 import type { IncidentWithRelations } from '@/lib/types';
 
+const description =
+  'Active FastHand incidents and recent resolutions with public timelines.';
+
 export const metadata: Metadata = {
   title: 'Incidents',
-  description: 'Active FastHand incidents and recent resolutions with public timelines.',
+  description,
+  alternates: { canonical: '/incidents' },
+  openGraph: {
+    type: 'website',
+    url: '/incidents',
+    siteName: 'FastHand Status',
+    title: 'FastHand incidents — active and resolved',
+    description,
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FastHand incidents — active and resolved',
+    description,
+  },
 };
 
 const IMPACT_ORDER = { critical: 4, major: 3, minor: 2, none: 1 } as const;

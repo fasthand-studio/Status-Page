@@ -9,7 +9,14 @@ import { secondaryButtonClass } from '@/components/admin/ui';
 import { ArrowUpRightIcon, LogOutIcon } from '@/components/icons';
 
 export const metadata: Metadata = {
-  robots: { index: false, follow: false },
+  title: { default: 'FastHand Ops', template: '%s' },
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+  },
 };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
