@@ -12,6 +12,7 @@ import type { Monitor } from '@/lib/types';
 import {
   firstIssue,
   formText,
+  groupSchema,
   incidentCreateSchema,
   incidentEditSchema,
   incidentUpdateSchema,
@@ -356,6 +357,113 @@ export async function deleteServiceAction(_state: ActionState, formData: FormDat
   revalidatePath('/admin/services');
   revalidatePath(`/admin/services/${serviceId}`);
   redirect('/admin/services?deleted=1');
+}
+
+// ---------------------------------------------------------------------------
+// Service groups
+// ---------------------------------------------------------------------------
+
+function parseGroupForm(formData: FormData) {
+  return groupSchema.safeParse({
+    name: formText(formData, 'name'),
+    slug: formText(formData, 'slug'),
+    description: formText(formData, 'description'),
+    sort_order: formText(formData, 'sort_order') || '0',
+  });
+}
+
+function groupRecord(parsed: NonNullable<ReturnType<typeof parseGroupForm>['data']>) {
+  const slug = parsed.slug || slugify(parsed.name);
+  return {
+    name: parsed.name,
+    slug,
+    description: parsed.description || null,
+    sort_order: parsed.sort_order,
+  };
+}
+
+export async function createGroupAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const parsed = parseGroupForm(formData);
+  if (!parsed.success) return failed(firstIssue(parsed.error));
+
+  const record = groupRecord(parsed.data);
+  if (!record.slug) return failed('Could not build a slug from that name. Enter one manually.');
+
+  const { data, error } = await auth.session.supabase
+    .from('service_groups')
+    .insert(record)
+    .select('id')
+    .single();
+
+  if (error || !data) {
+    return failed(dbMessage(error ?? { message: 'no row returned' }, 'Could not create the group.'));
+  }
+
+  revalidateStatusPages();
+  revalidatePath('/admin/groups');
+  redirect(`/admin/groups/${data.id}?created=1`);
+}
+
+export async function updateGroupAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const groupId = formText(formData, 'group_id');
+  if (!isUuid(groupId)) return failed('That group link is not valid.');
+
+  const parsed = parseGroupForm(formData);
+  if (!parsed.success) return failed(firstIssue(parsed.error));
+
+  const record = groupRecord(parsed.data);
+  if (!record.slug) return failed('Could not build a slug from that name. Enter one manually.');
+
+  const { error } = await auth.session.supabase
+    .from('service_groups')
+    .update(record)
+    .eq('id', groupId);
+
+  if (error) return failed(dbMessage(error, 'Could not save the group.'));
+
+  revalidateStatusPages();
+  revalidatePath('/admin/groups');
+  revalidatePath(`/admin/groups/${groupId}`);
+  redirect(`/admin/groups/${groupId}?saved=1`);
+}
+
+export async function deleteGroupAction(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const auth = await requireActionAdmin();
+  if (!auth.ok) return auth.state;
+
+  const groupId = formText(formData, 'group_id');
+  if (!isUuid(groupId)) return failed('That group link is not valid.');
+
+  const { count } = await auth.session.supabase
+    .from('services')
+    .select('id', { count: 'exact', head: true })
+    .eq('group_id', groupId);
+
+  if (count) {
+    return failed(
+      `That group still has ${count} ${count === 1 ? 'service' : 'services'}. Move them to another group or delete them first.`,
+    );
+  }
+
+  const { data, error } = await auth.session.supabase
+    .from('service_groups')
+    .delete()
+    .eq('id', groupId)
+    .select('id');
+
+  if (error) return failed(dbMessage(error, 'Could not delete the group.'));
+  if (!data || data.length === 0) return failed('That group no longer exists.');
+
+  revalidateStatusPages();
+  revalidatePath('/admin/groups');
+  revalidatePath(`/admin/groups/${groupId}`);
+  redirect('/admin/groups?deleted=1');
 }
 
 // ---------------------------------------------------------------------------

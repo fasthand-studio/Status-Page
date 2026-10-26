@@ -26,10 +26,21 @@ The ops desk can draft incident copy with Groq; drafts stay in the form until yo
 | Maintenance | `/maintenance` | Scheduled, active, and past windows |
 | Archive | `/history` | Resolved incidents by month, maintenance archive |
 | Admin sign in | `/admin/login` | Supabase email/password, allowlist enforced |
-| Ops desk | `/admin` | Overview, incidents, services, monitors, maintenance |
+| Ops desk | `/admin` | Overview, incidents, services, groups, monitors, maintenance |
 
 The admin area is `noindex`, protected by middleware, re-checked in every server action, and backed by Row
 Level Security.
+
+### Groups and services
+
+A **service group** is the heading the public page files services under (`Core platform`, `Seller tools`, and
+so on). Manage them at `/admin/groups` — create, rename, reorder, delete — instead of editing SQL.
+
+- A group holds a name, an optional slug (derived from the name when blank), an optional description, and a
+  sort order. Groups with a lower order appear first on `/` and `/services`.
+- A group can only be deleted when no service still points at it; the ops desk refuses and tells you how many
+  services are in the way, because the schema uses `on delete restrict` on purpose.
+- The seed migration creates the initial four groups. After that the manager is the normal way to change them.
 
 ### Drafting incident and maintenance copy
 

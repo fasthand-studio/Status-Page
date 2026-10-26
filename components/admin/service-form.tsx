@@ -1,5 +1,6 @@
 import type { ActionState } from '@/lib/action-state';
 import type { Monitor, Service } from '@/lib/types';
+import Link from 'next/link';
 import { ActionForm } from './action-form';
 import { SubmitButton } from './submit-button';
 import {
@@ -7,6 +8,7 @@ import {
   adminInputClass,
   adminSelectClass,
   Field,
+  linkClass,
   Notice,
 } from './ui';
 
@@ -26,8 +28,11 @@ export function ServiceForm({
   if (groups.length === 0) {
     return (
       <Notice tone="warn">
-        No service groups exist. Apply the seed migration (<span className="font-sans">0002_seed.sql</span>) before
-        creating services.
+        No service groups exist yet.{' '}
+        <Link href="/admin/groups/new" className={linkClass}>
+          Create a group
+        </Link>{' '}
+        before adding services.
       </Notice>
     );
   }

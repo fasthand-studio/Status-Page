@@ -62,7 +62,11 @@ export default async function AdminServicesPage({
 
       {data.services.length === 0 ? (
         <EmptyAdminState title="No services yet">
-          Apply the seed migration to create the initial groups and services, or add one manually.
+          Every service sits under a group, so create one under{' '}
+          <Link href="/admin/groups" className={linkClass}>
+            Groups
+          </Link>{' '}
+          first, then add services.
         </EmptyAdminState>
       ) : (
         <div className={`${adminCardClass} overflow-x-auto`}>

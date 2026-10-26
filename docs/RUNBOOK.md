@@ -65,10 +65,21 @@ That is the honest state, not a bug.
 
 ## Adding a service / monitor
 
-1. Verify a health endpoint that proves the service. HTTP 200 alone is not enough.
-2. Create or edit the monitor; run it once and inspect the stored result.
-3. Attach it to the service. Confirm the public row changes from **No check** to a measured state.
-4. Watch one scheduled run.
+1. Put it in a group first — `/admin/groups/new` if none of the existing headings fits.
+2. Verify a health endpoint that proves the service. HTTP 200 alone is not enough.
+3. Create or edit the monitor; run it once and inspect the stored result.
+4. Attach it to the service. Confirm the public row changes from **No check** to a measured state.
+5. Watch one scheduled run.
+
+## Service groups
+
+`/admin/groups` is where the public page's headings come from: name, slug, description, and the order the
+groups appear in on `/` and `/services`.
+
+- Changing a group name or description is live as soon as you save; nothing else moves.
+- A group cannot be deleted while services still point at it. The ops desk refuses and names the count —
+  move those services to another group, or delete them, then delete the group.
+- Reordering is done with **Sort order**, not drag-and-drop; lower numbers appear first.
 
 ## Admin access
 

@@ -118,6 +118,24 @@ export const incidentUpdateSchema = z.object({
   body: markdownBody,
 });
 
+export const groupSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Give the group a name of at least 2 characters.')
+    .max(80, 'Keep the name under 80 characters.'),
+  slug: z
+    .string()
+    .trim()
+    .max(60, 'Keep the slug under 60 characters.')
+    .refine(
+      (value) => value === '' || SLUG_PATTERN.test(value),
+      'Use lowercase letters, numbers, and single hyphens.',
+    ),
+  description: z.string().trim().max(400, 'Keep the description under 400 characters.'),
+  sort_order: z.coerce.number().int().min(-9999).max(9999),
+});
+
 export const serviceSchema = z.object({
   name: z
     .string()

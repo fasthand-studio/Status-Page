@@ -127,6 +127,38 @@ export async function loadAdminService(client: SupabaseClient, id: string) {
   };
 }
 
+export interface AdminGroupListItem extends ServiceGroup {
+  serviceCount: number;
+}
+
+export async function loadAdminGroups(client: SupabaseClient): Promise<AdminGroupListItem[]> {
+  const [groupsResult, servicesResult] = await Promise.all([
+    client.from('service_groups').select('*').order('sort_order'),
+    client.from('services').select('group_id'),
+  ]);
+
+  const groups = (unwrap(groupsResult) ?? []) as ServiceGroup[];
+  const services = (unwrap(servicesResult) ?? []) as { group_id: string }[];
+  const counts = new Map<string, number>();
+  for (const service of services) {
+    counts.set(service.group_id, (counts.get(service.group_id) ?? 0) + 1);
+  }
+
+  return groups.map((group) => ({ ...group, serviceCount: counts.get(group.id) ?? 0 }));
+}
+
+export async function loadAdminGroup(client: SupabaseClient, id: string) {
+  const [groupResult, servicesResult] = await Promise.all([
+    client.from('service_groups').select('*').eq('id', id).maybeSingle(),
+    client.from('services').select('id, name, slug, sort_order').eq('group_id', id).order('sort_order'),
+  ]);
+
+  return {
+    group: (unwrap(groupResult) as ServiceGroup | null) ?? null,
+    services: (unwrap(servicesResult) ?? []) as Pick<Service, 'id' | 'name' | 'slug' | 'sort_order'>[],
+  };
+}
+
 export interface AdminMonitorView extends Monitor {
   status: MonitorStatus | null;
   latest: CheckResult | null;
