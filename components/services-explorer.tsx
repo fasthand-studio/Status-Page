@@ -209,11 +209,11 @@ export function ServicesExplorer({
                         <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_16px] items-center gap-x-2.5 px-3 py-2.5 transition-colors sm:px-3.5 sm:py-3 hover:bg-surface-soft md:grid-cols-[20px_minmax(0,1fr)_262px_88px_16px] [&::-webkit-details-marker]:hidden">
                           <ServiceIcon slug={service.slug} />
                           <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="truncate text-[17px] font-medium">{service.name}</span>
+                            <span className="block truncate text-[17px] font-medium">{service.name}</span>
+                            <div className="mt-1">
                               <StatusPill state={service.health.state} />
                             </div>
-                            <span className="mt-0.5 block truncate text-[14px] text-muted">
+                            <span className="mt-1 block truncate text-[14px] text-muted">
                               {service.lastCheckAt
                                 ? `Checked ${formatRelativeTime(service.lastCheckAt, now)}`
                                 : 'No checks recorded'}

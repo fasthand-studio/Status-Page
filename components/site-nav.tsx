@@ -30,7 +30,7 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
       aria-label="Status sections"
       className={cn(
         'flex items-center',
-        compact ? 'gap-1 overflow-x-auto no-scrollbar' : 'gap-1.5',
+        compact ? 'gap-0.5 overflow-x-auto no-scrollbar' : 'gap-1.5',
       )}
     >
       {ITEMS.map((item) => {
@@ -42,6 +42,7 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
             aria-current={active ? 'page' : undefined}
             className={cn(
               'fh-pill-lg shrink-0 justify-center transition-colors',
+              compact ? 'px-2 text-[14px]' : 'px-3',
               active
                 ? 'bg-primary/[0.08] text-primary'
                 : 'bg-transparent text-muted hover:bg-surface-soft hover:text-ink',
