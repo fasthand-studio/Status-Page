@@ -4,7 +4,6 @@ import {
   buildMessages,
   draftIncidentCopy,
   parseDraft,
-  writerModel,
   WriterError,
 } from '../lib/incident-writer';
 
@@ -112,65 +111,138 @@ const request = {
   status: 'investigating' as const,
 };
 
-test('the writer sends the key it was given and returns the parsed draft', async () => {
+const CHAT = 'https://api.groq.com/openai/v1/chat/completions';
+const MODELS = 'https://api.groq.com/openai/v1/models';
+const FIRST_CHOICE = 'llama-3.3-70b-versatile';
+
+function chatOk(title: string, body: string): Response {
+  return new Response(
+    JSON.stringify({ choices: [{ message: { content: `TITLE: ${title}\nBODY: ${body}` } }] }),
+    { status: 200, headers: { 'content-type': 'application/json' } },
+  );
+}
+
+function modelNotFound(): Response {
+  return new Response(
+    JSON.stringify({
+      error: {
+        message: 'The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.',
+        code: 'model_not_found',
+      },
+    }),
+    { status: 404 },
+  );
+}
+
+function modelsOf(ids: string[]): Response {
+  return new Response(JSON.stringify({ data: ids.map((id) => ({ id })) }), {
+    status: 200,
+    headers: { 'content-type': 'application/json' },
+  });
+}
+
+function withGroqKey(stub: typeof fetch): () => void {
   process.env.GROQ = 'test-key';
   const original = globalThis.fetch;
-  globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
+  globalThis.fetch = stub;
+  return () => {
+    globalThis.fetch = original;
+    delete process.env.GROQ;
+    delete process.env.GROQ_MODEL;
+  };
+}
+
+test('the writer asks Groq for its first-choice model and returns the parsed draft', async () => {
+  const seen: unknown[] = [];
+  const restore = withGroqKey((async (url: unknown, init?: RequestInit) => {
     const body = JSON.parse(String(init?.body));
-    assert.equal(String(url), 'https://api.groq.com/openai/v1/chat/completions');
+    seen.push(body.model);
+    assert.equal(String(url), CHAT);
     assert.equal(init?.method, 'POST');
     assert.equal(new Headers(init?.headers).get('authorization'), 'Bearer test-key');
-    assert.equal(body.model, 'llama-3.1-8b-instant');
     assert.equal(body.response_format, undefined);
     assert.equal(body.messages.length, 2);
-
-    return new Response(
-      JSON.stringify({
-        choices: [{ message: { content: 'TITLE: Checkout is timing out\nBODY: We are investigating.' } }],
-      }),
-      { status: 200, headers: { 'content-type': 'application/json' } },
-    );
-  }) as typeof fetch;
+    return chatOk('Checkout is timing out', 'We are investigating.');
+  }) as typeof fetch);
 
   try {
     assert.deepEqual(await draftIncidentCopy(request), {
       title: 'Checkout is timing out',
       body: 'We are investigating.',
+      model: FIRST_CHOICE,
     });
+    assert.deepEqual(seen, [FIRST_CHOICE]);
   } finally {
-    globalThis.fetch = original;
-    delete process.env.GROQ;
+    restore();
   }
 });
 
-test('GROQ_MODEL picks the model when it is set', async () => {
-  process.env.GROQ = 'test-key';
-  process.env.GROQ_MODEL = 'llama-3.3-70b-versatile';
-  const original = globalThis.fetch;
-  const sent: string[] = [];
-  globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
-    sent.push(JSON.parse(String(init?.body)).model);
-    return new Response(
-      JSON.stringify({ choices: [{ message: { content: 'TITLE: A title\nBODY: A body.' } }] }),
-      { status: 200, headers: { 'content-type': 'application/json' } },
-    );
-  }) as typeof fetch;
+test('GROQ_MODEL pins the first request to that model', async () => {
+  process.env.GROQ_MODEL = 'llama-3.1-8b-instant';
+  const seen: unknown[] = [];
+  const restore = withGroqKey((async (_url: unknown, init?: RequestInit) => {
+    seen.push(JSON.parse(String(init?.body)).model);
+    return chatOk('Checkout is timing out', 'We are investigating.');
+  }) as typeof fetch);
 
   try {
-    assert.equal(writerModel(), 'llama-3.3-70b-versatile');
-    await draftIncidentCopy(request);
-    assert.deepEqual(sent, ['llama-3.3-70b-versatile']);
+    const draft = await draftIncidentCopy(request);
+    assert.equal(draft.model, 'llama-3.1-8b-instant');
+    assert.deepEqual(seen, ['llama-3.1-8b-instant']);
   } finally {
-    globalThis.fetch = original;
-    delete process.env.GROQ;
-    delete process.env.GROQ_MODEL;
+    restore();
+  }
+});
+
+test('a refused model is replaced with one this key actually has', async () => {
+  const seen: string[] = [];
+  const restore = withGroqKey((async (url: unknown, init?: RequestInit) => {
+    if (String(url) === MODELS) {
+      seen.push('models');
+      return modelsOf(['whisper-large-v3', 'llama-3.1-8b-instant', 'gemma2']);
+    }
+    const model = JSON.parse(String(init?.body)).model;
+    seen.push(model);
+    return model === FIRST_CHOICE ? modelNotFound() : chatOk('Checkout is timing out', 'We are investigating.');
+  }) as typeof fetch);
+
+  try {
+    const draft = await draftIncidentCopy(request);
+    assert.deepEqual(seen, [FIRST_CHOICE, 'models', 'llama-3.1-8b-instant']);
+    assert.equal(draft.model, 'llama-3.1-8b-instant');
+    assert.equal(draft.body, 'We are investigating.');
+  } finally {
+    restore();
+  }
+});
+
+test('when the key has none of the writer models the error names what it does have', async () => {
+  const seen: string[] = [];
+  const restore = withGroqKey((async (url: unknown, init?: RequestInit) => {
+    if (String(url) === MODELS) {
+      seen.push('models');
+      return modelsOf(['playai-tts', 'whisper-large-v3']);
+    }
+    seen.push(JSON.parse(String(init?.body)).model);
+    return modelNotFound();
+  }) as typeof fetch);
+
+  try {
+    await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
+      assert.ok(caught instanceof WriterError);
+      assert.equal(caught.code, 'model-unavailable');
+      assert.match(caught.message, /no model the writer can use/);
+      assert.match(caught.message, /playai-tts, whisper-large-v3/);
+      return true;
+    });
+    assert.deepEqual(seen, [FIRST_CHOICE, 'models']);
+  } finally {
+    restore();
   }
 });
 
 test('a rate limit from Groq surfaces as a retryable failure', async () => {
-  process.env.GROQ = 'test-key';
-  const original = globalThis.fetch;
-  globalThis.fetch = (async () => new Response('{}', { status: 429 })) as typeof fetch;
+  const restore = withGroqKey((async () => new Response('{}', { status: 429 })) as typeof fetch);
 
   try {
     await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
@@ -179,43 +251,49 @@ test('a rate limit from Groq surfaces as a retryable failure', async () => {
       return true;
     });
   } finally {
-    globalThis.fetch = original;
-    delete process.env.GROQ;
+    restore();
   }
 });
 
-test('a rejected request tells you what Groq said', async () => {
-  process.env.GROQ = 'test-key';
-  const original = globalThis.fetch;
-  globalThis.fetch = (async () =>
-    new Response(
-      JSON.stringify({
-        error: { message: 'The model `llama-9.9-400b` does not exist.', code: 'model_not_found' },
-      }),
+test('any other refusal tells you what Groq said without probing the model list', async () => {
+  const seen: string[] = [];
+  const restore = withGroqKey((async (url: unknown) => {
+    seen.push(String(url));
+    return new Response(
+      JSON.stringify({ error: { message: 'Context length exceeded for this request.', code: 'context_length_exceeded' } }),
       { status: 400 },
-    )) as typeof fetch;
+    );
+  }) as typeof fetch);
 
   try {
     await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
       assert.ok(caught instanceof WriterError);
       assert.equal(caught.code, 'provider-error');
       assert.match(caught.message, /Groq HTTP 400/);
-      assert.match(caught.message, /does not exist/);
-      assert.match(caught.message, /model_not_found/);
+      assert.match(caught.message, /Context length exceeded/);
+      assert.match(caught.message, /context_length_exceeded/);
       return true;
     });
+    assert.deepEqual(seen, [CHAT]);
   } finally {
-    globalThis.fetch = original;
-    delete process.env.GROQ;
+    restore();
   }
 });
 
 test('the writer refuses to call Groq without a key', async () => {
   delete process.env.GROQ;
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () => {
+    throw new Error('the writer called Groq without a key');
+  }) as typeof fetch;
 
-  await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
-    assert.ok(caught instanceof WriterError);
-    assert.equal(caught.code, 'missing-key');
-    return true;
-  });
+  try {
+    await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
+      assert.ok(caught instanceof WriterError);
+      assert.equal(caught.code, 'missing-key');
+      return true;
+    });
+  } finally {
+    globalThis.fetch = original;
+  }
 });

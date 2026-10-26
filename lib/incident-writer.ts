@@ -2,8 +2,21 @@ import type { IncidentImpact, IncidentStatus } from './types';
 import { INCIDENT_IMPACT_LABELS, INCIDENT_STATUS_LABELS } from './validation';
 
 const CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const FALLBACK_MODEL = 'llama-3.1-8b-instant';
+const MODELS_URL = 'https://api.groq.com/openai/v1/models';
 const TIMEOUT_MS = 20_000;
+const LIST_TIMEOUT_MS = 8_000;
+
+/*
+ * Which model to ask for, in order. Groq's model list differs per account, so
+ * the first entry the key actually has is used; GROQ_MODEL overrides the
+ * search and is retried once before giving up.
+ */
+const MODEL_CANDIDATES = [
+  'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'openai/gpt-oss-20b',
+  'meta-llama/llama-4-scout-17b-16e-instruct',
+];
 
 export const NOTES_LIMIT = 1500;
 export const TITLE_LIMIT = 140;
@@ -20,9 +33,13 @@ export interface DraftInput {
   incidentTitle?: string;
 }
 
-export interface DraftResult {
+export interface DraftContent {
   title: string | null;
   body: string;
+}
+
+export interface DraftResult extends DraftContent {
+  model: string;
 }
 
 export type WriterFailure =
@@ -31,6 +48,7 @@ export type WriterFailure =
   | 'rate-limited'
   | 'timeout'
   | 'bad-output'
+  | 'model-unavailable'
   | 'provider-error';
 
 const FAILURES: Record<WriterFailure, string> = {
@@ -39,6 +57,7 @@ const FAILURES: Record<WriterFailure, string> = {
   'rate-limited': 'Groq is rate limiting this workspace. Try again in a minute.',
   timeout: 'Groq did not answer in time. Try again.',
   'bad-output': 'The draft came back unreadable. Add a little more detail and try again.',
+  'model-unavailable': 'Groq gives this key no model the writer can use.',
   'provider-error': 'Groq refused the request.',
 };
 
@@ -50,10 +69,6 @@ export class WriterError extends Error {
     this.name = 'WriterError';
     this.code = code;
   }
-}
-
-export function writerModel(): string {
-  return process.env.GROQ_MODEL?.trim() || FALLBACK_MODEL;
 }
 
 export function isWriterConfigured(): boolean {
@@ -124,7 +139,7 @@ function clean(value: string, limit: number): string {
     .slice(0, limit);
 }
 
-export function parseDraft(raw: string, mode: DraftMode): DraftResult {
+export function parseDraft(raw: string, mode: DraftMode): DraftContent {
   const text = raw.replace(/^[ \t]*```[a-z]*[ \t]*$/gim, '').trim();
 
   const bodyMatch = /BODY\s*:([\s\S]*)$/im.exec(text);
@@ -156,10 +171,23 @@ async function readFailure(response: Response): Promise<string> {
   return `Groq HTTP ${response.status}${message ? `: ${message.slice(0, 200)}` : ''}`;
 }
 
-export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult> {
-  const apiKey = process.env.GROQ?.trim() ?? '';
-  if (!apiKey) throw new WriterError('missing-key');
+type ChatAttempt =
+  | { ok: true; response: Response }
+  | {
+      ok: false;
+      kind: 'unauthorized' | 'rate-limited' | 'timeout' | 'model-rejected' | 'other';
+      detail: string;
+    };
 
+function requestedModel(): string {
+  return process.env.GROQ_MODEL?.trim() || MODEL_CANDIDATES[0];
+}
+
+function isModelRejection(status: number, detail: string): boolean {
+  return status === 404 || /model_not_found|does not exist|access to it/i.test(detail);
+}
+
+async function attemptChat(apiKey: string, model: string, input: DraftInput): Promise<ChatAttempt> {
   let response: Response;
   try {
     response = await fetch(CHAT_URL, {
@@ -169,7 +197,7 @@ export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult>
         authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: writerModel(),
+        model,
         messages: buildMessages(input),
         temperature: 0.2,
         max_tokens: 500,
@@ -177,19 +205,40 @@ export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult>
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (caught) {
-    const timedOut = caught instanceof Error && caught.name === 'TimeoutError';
-    if (timedOut) throw new WriterError('timeout');
-    throw new WriterError('provider-error', caught instanceof Error ? caught.message : 'fetch failed');
+    if (caught instanceof Error && caught.name === 'TimeoutError') {
+      return { ok: false, kind: 'timeout', detail: 'Groq did not answer within 20 seconds.' };
+    }
+    return {
+      ok: false,
+      kind: 'other',
+      detail: caught instanceof Error ? caught.message : 'the request did not leave the app',
+    };
   }
 
-  if (response.status === 401 || response.status === 403) throw new WriterError('unauthorized');
-  if (response.status === 429) throw new WriterError('rate-limited');
-  if (!response.ok) {
-    const detail = await readFailure(response);
-    console.error(`[writer] ${detail}`);
-    throw new WriterError('provider-error', detail);
+  if (response.ok) return { ok: true, response };
+  if (response.status === 401 || response.status === 403) {
+    return { ok: false, kind: 'unauthorized', detail: `Groq HTTP ${response.status}` };
+  }
+  if (response.status === 429) {
+    return { ok: false, kind: 'rate-limited', detail: `Groq HTTP ${response.status}` };
   }
 
+  const detail = await readFailure(response);
+  return {
+    ok: false,
+    kind: isModelRejection(response.status, detail) ? 'model-rejected' : 'other',
+    detail,
+  };
+}
+
+function failureFrom(attempt: Extract<ChatAttempt, { ok: false }>): WriterError {
+  if (attempt.kind === 'unauthorized') return new WriterError('unauthorized');
+  if (attempt.kind === 'rate-limited') return new WriterError('rate-limited');
+  if (attempt.kind === 'timeout') return new WriterError('timeout');
+  return new WriterError('provider-error', attempt.detail);
+}
+
+async function contentOf(response: Response): Promise<string> {
   let payload: unknown;
   try {
     payload = await response.json();
@@ -201,5 +250,55 @@ export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult>
     ?.content;
   if (typeof content !== 'string') throw new WriterError('bad-output');
 
-  return parseDraft(content, input.mode);
+  return content;
+}
+
+async function listModels(apiKey: string): Promise<string[]> {
+  try {
+    const response = await fetch(MODELS_URL, {
+      headers: { authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(LIST_TIMEOUT_MS),
+    });
+    if (!response.ok) return [];
+
+    const payload = (await response.json()) as { data?: { id?: unknown }[] };
+    return (payload.data ?? [])
+      .map((row) => row.id)
+      .filter((id): id is string => typeof id === 'string');
+  } catch {
+    return [];
+  }
+}
+
+export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult> {
+  const apiKey = process.env.GROQ?.trim() ?? '';
+  if (!apiKey) throw new WriterError('missing-key');
+
+  const requested = requestedModel();
+  const first = await attemptChat(apiKey, requested, input);
+
+  if (first.ok) {
+    return { ...parseDraft(await contentOf(first.response), input.mode), model: requested };
+  }
+
+  if (first.kind !== 'model-rejected') throw failureFrom(first);
+
+  console.error(`[writer] Groq refused ${requested}: ${first.detail}`);
+  const available = await listModels(apiKey);
+  const usable = MODEL_CANDIDATES.find((model) => model !== requested && available.includes(model));
+
+  if (!usable) {
+    throw new WriterError(
+      'model-unavailable',
+      available.length ? `this key has ${available.slice(0, 10).join(', ')}` : 'Groq did not return a model list',
+    );
+  }
+
+  const second = await attemptChat(apiKey, usable, input);
+  if (!second.ok) {
+    console.error(`[writer] retry with ${usable} failed: ${second.detail}`);
+    throw failureFrom(second);
+  }
+
+  return { ...parseDraft(await contentOf(second.response), input.mode), model: usable };
 }

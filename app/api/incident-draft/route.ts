@@ -30,6 +30,7 @@ const STATUS_BY_FAILURE = {
   'rate-limited': 429,
   timeout: 504,
   'bad-output': 502,
+  'model-unavailable': 502,
   'provider-error': 502,
 } as const;
 

@@ -10,6 +10,7 @@ import { adminHintClass, adminLabelClass, secondaryButtonClass } from './ui';
 export interface WrittenDraft {
   title: string | null;
   body: string;
+  model?: string;
 }
 
 export function DraftWriter({
@@ -46,7 +47,10 @@ export function DraftWriter({
         return;
       }
       onDraft({ title: payload.title ?? null, body: payload.body });
-      setMessage({ tone: 'ok', text: 'Written into the fields. Correct anything that is not true before publishing.' });
+      setMessage({
+        tone: 'ok',
+        text: `Written into the fields by ${payload.model ?? 'Groq'}. Correct anything that is not true before publishing.`,
+      });
     } catch {
       setMessage({ tone: 'bad', text: 'Could not reach the draft writer. Try again.' });
     } finally {
