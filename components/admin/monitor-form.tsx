@@ -183,7 +183,7 @@ export function MonitorForm({
       </div>
 
       <div className="space-y-2 fh-r-sm border border-line bg-paper px-3 py-2">
-        <label className="flex items-center gap-3 text-[11.5px] text-ink/85">
+        <label className="flex items-center gap-3 text-[14px] text-ink/85">
           <input
             type="checkbox"
             name="enabled"

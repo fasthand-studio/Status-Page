@@ -18,8 +18,8 @@ export function EmptyState({
       )}
     >
       <InboxIcon className="h-6 w-6 text-muted" />
-      <p className="mt-2.5 text-[14px] font-semibold">{title}</p>
-      <p className="mt-1 max-w-sm text-[12px] leading-relaxed text-muted">{description}</p>
+      <p className="mt-2.5 text-[17px] font-semibold">{title}</p>
+      <p className="mt-1 max-w-sm text-[14px] leading-relaxed text-muted">{description}</p>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export function StatusPill({
 
   return (
     <span className={cn('fh-pill font-medium', TONES[state], className)}>
-      <Icon className="h-3 w-3 shrink-0" strokeWidth={2.3} aria-hidden="true" />
+      <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={2.3} aria-hidden="true" />
       {label ?? LABELS[state]}
     </span>
   );

@@ -43,7 +43,7 @@ export function ServiceCheckboxes({
 
   if (services.length === 0) {
     return (
-      <div className="fh-r-sm border border-dashed border-line px-3 py-2 text-[11.5px] text-muted">
+      <div className="fh-r-sm border border-dashed border-line px-3 py-2 text-[14px] text-muted">
         No services exist yet. Create a service first, then link it here.
       </div>
     );
@@ -52,9 +52,9 @@ export function ServiceCheckboxes({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-sans text-[11.5px] text-muted">
+        <p className="font-sans text-[14px] text-muted">
           {label}
-          <span className="ml-2 font-sans text-[11.5px] font-semibold text-muted">
+          <span className="ml-2 font-sans text-[14px] font-semibold text-muted">
             {selected.size} selected
           </span>
         </p>
@@ -80,7 +80,7 @@ export function ServiceCheckboxes({
         {[...grouped.entries()].map(([groupName, groupServices]) => (
           <div key={groupName || 'ungrouped'} className="min-w-0">
             {groupName ? (
-              <p className="mb-1.5 font-sans text-[11.5px] text-muted">
+              <p className="mb-1.5 font-sans text-[14px] text-muted">
                 {groupName}
               </p>
             ) : null}
@@ -91,7 +91,7 @@ export function ServiceCheckboxes({
                   <label
                     key={service.id}
                     className={cn(
-                      'flex cursor-pointer items-center gap-2.5 fh-r-xs px-2 py-1.5 text-[11.5px] transition',
+                      'fh-pill-lg w-full cursor-pointer justify-start gap-2.5 px-3 text-[15px] transition',
                       checked ? 'bg-primary/10 text-ink' : 'text-muted hover:bg-ink/5',
                     )}
                   >

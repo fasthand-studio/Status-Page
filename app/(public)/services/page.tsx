@@ -121,7 +121,7 @@ export default async function ServicesPage() {
       </div>
 
       {overall.staleCount > 0 && (
-        <div className="mt-3 flex items-start gap-2 fh-r-sm border border-warn/30 bg-warn-soft/60 px-3 py-2 text-[12px] text-ink/80">
+        <div className="mt-3 flex items-start gap-2 fh-r-sm border border-warn/30 bg-warn-soft/60 px-3 py-2 text-[14px] text-ink/80">
           <AlertIcon className="mt-px h-3.5 w-3.5 shrink-0 text-warn" />
           <p>
             {overall.staleCount} monitored service{overall.staleCount === 1 ? ' has' : 's have'} missed
@@ -140,7 +140,7 @@ export default async function ServicesPage() {
         />
       </div>
 
-      <p className="mt-5 max-w-3xl text-[11.5px] leading-relaxed text-muted">
+      <p className="mt-5 max-w-3xl text-[14px] leading-relaxed text-muted">
         Uptime is successful checks divided by recorded checks per UTC day. Missing or stale days are
         excluded; services without a monitor have no percentage.
       </p>

@@ -11,12 +11,12 @@ export function SiteFooter() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-sm">
             <Brand />
-            <p className="mt-2 text-[12px] leading-relaxed text-muted">
+            <p className="mt-2 text-[14px] leading-relaxed text-muted">
               Uptime is calculated from stored checks. Services without a verified monitor stay grey
               and are never assumed healthy.
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-[12px] text-muted">
+          <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-[14px] text-muted">
             <Link className="hover:text-ink" href="/services">Services</Link>
             <Link className="hover:text-ink" href="/incidents">Incidents</Link>
             <Link className="hover:text-ink" href="/maintenance">Maintenance</Link>
@@ -28,12 +28,12 @@ export function SiteFooter() {
               rel="noreferrer noopener"
             >
               FastHand Studio
-              <ArrowUpRightIcon className="h-3 w-3" />
+              <ArrowUpRightIcon className="h-3.5 w-3.5" />
             </a>
             <Link className="hover:text-ink" href="/admin/login">Operations desk</Link>
           </div>
         </div>
-        <div className="mt-4 flex flex-col gap-1 border-t border-line pt-3 text-[12px] text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-1 border-t border-line pt-3 text-[14px] text-muted sm:flex-row sm:items-center sm:justify-between">
           <span>© {year} FastHand Studio</span>
           <span>Checks every 5 minutes · all times UTC</span>
         </div>

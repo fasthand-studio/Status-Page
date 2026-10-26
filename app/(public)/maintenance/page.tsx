@@ -30,13 +30,13 @@ function MaintenanceRow({
 
   return (
     <details className="group border-b border-line last:border-b-0">
-      <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto_14px] items-center gap-x-3 px-3.5 py-2.5 transition-colors hover:bg-surface-soft sm:grid-cols-[150px_minmax(0,1fr)_auto_14px] [&::-webkit-details-marker]:hidden">
-        <span className="fh-num hidden text-[11.5px] text-muted sm:block">
+      <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto_16px] items-center gap-x-3 px-3 py-2.5 transition-colors sm:px-3.5 sm:py-3 hover:bg-surface-soft sm:grid-cols-[196px_minmax(0,1fr)_auto_16px] [&::-webkit-details-marker]:hidden">
+        <span className="fh-num hidden text-[14px] text-muted sm:block">
           {formatWindowShort(window.scheduled_start, window.scheduled_end)}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-[13px] font-medium">{window.title}</p>
-          <p className="mt-0.5 truncate text-[11.5px] text-muted">
+          <p className="truncate text-[15px] font-medium">{window.title}</p>
+          <p className="mt-0.5 truncate text-[14px] text-muted">
             <span className="fh-num sm:hidden">
               {formatWindowShort(window.scheduled_start, window.scheduled_end)} ·{' '}
             </span>
@@ -47,7 +47,7 @@ function MaintenanceRow({
         <ChevronDownIcon className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-180" />
       </summary>
       <div className="border-t border-line bg-surface-soft px-3.5 py-3 sm:pl-[162px]">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-muted">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted">
           <span className="fh-num">{current.note}</span>
           <span className="h-3 w-px bg-line" aria-hidden="true" />
           <span className="fh-num">Recorded {formatDateTime(window.created_at)}</span>
@@ -56,11 +56,11 @@ function MaintenanceRow({
           {window.body ? (
             <Markdown className="max-w-3xl">{window.body}</Markdown>
           ) : (
-            <p className="text-[12px] text-muted">No notes were attached beyond the window itself.</p>
+            <p className="text-[14px] text-muted">No notes were attached beyond the window itself.</p>
           )}
         </div>
         {affected.length > 0 && (
-          <p className="mt-2 text-[12px] text-muted">Affects {affected.join(', ')}.</p>
+          <p className="mt-2 text-[14px] text-muted">Affects {affected.join(', ')}.</p>
         )}
       </div>
     </details>
@@ -69,7 +69,7 @@ function MaintenanceRow({
 
 function EmptyRow({ children }: { children: ReactNode }) {
   return (
-    <div className="fh-card border border-line bg-surface px-3.5 py-2.5 text-[12.5px] text-muted">
+    <div className="fh-card border border-line bg-surface px-3.5 py-2.5 text-[15px] text-muted">
       {children}
     </div>
   );

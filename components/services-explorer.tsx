@@ -121,24 +121,24 @@ export function ServicesExplorer({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search services or groups"
             aria-label="Search services"
-            className="fh-field w-full border border-line bg-surface pl-8 pr-16 text-[13px] text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none"
+            className="fh-field w-full border border-line bg-surface pl-8 pr-16 text-[15px] text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none"
           />
           <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
             {query ? (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="pointer-events-auto rounded-[3px] px-1.5 py-0.5 text-[11.5px] text-muted hover:bg-surface-soft hover:text-ink"
+                className="fh-pill pointer-events-auto px-2 text-[14px] text-muted hover:bg-surface-soft hover:text-ink"
               >
                 Clear
               </button>
             ) : (
-              <kbd className="fh-r-xs border border-line bg-surface-soft px-1.5 py-0.5 text-[11px] text-muted">/</kbd>
+              <kbd className="fh-pill border border-line bg-surface-soft px-2 text-[14px] text-muted">/</kbd>
             )}
           </span>
         </div>
 
-        <div className="flex items-center gap-3 self-end text-[12px] text-muted sm:self-auto">
+        <div className="flex items-center gap-3 self-end text-[14px] text-muted sm:self-auto">
           <button type="button" onClick={expandAll} className="hover:text-ink">
             Expand all
           </button>
@@ -149,7 +149,7 @@ export function ServicesExplorer({
         </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between text-[11.5px] text-muted">
+      <div className="mt-2 flex items-center justify-between text-[14px] text-muted">
         <span>
           {normalizedQuery
             ? `${matchCount} match${matchCount === 1 ? '' : 'es'} for “${query.trim()}”`
@@ -180,14 +180,14 @@ export function ServicesExplorer({
                   aria-expanded={isOpen}
                   className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left transition-colors hover:bg-surface-soft"
                 >
-                  <h2 className="text-[13.5px] font-semibold">{group.name}</h2>
+                  <h2 className="text-[17px] font-semibold">{group.name}</h2>
                   <StatusPill state={group.worst} />
                   {group.description && (
-                    <span className="hidden min-w-0 truncate text-[11.5px] text-muted lg:inline">
+                    <span className="hidden min-w-0 truncate text-[14px] text-muted lg:inline">
                       {group.description}
                     </span>
                   )}
-                  <span className="ml-auto hidden shrink-0 text-[11.5px] text-muted sm:inline">
+                  <span className="ml-auto hidden shrink-0 text-[14px] text-muted sm:inline">
                     {group.monitoredCount}/{group.services.length} checked
                   </span>
                   <ChevronDownIcon
@@ -206,14 +206,14 @@ export function ServicesExplorer({
                         id={`service-${service.slug}`}
                         className="group scroll-mt-24 border-b border-line last:border-b-0"
                       >
-                        <summary className="grid cursor-pointer list-none grid-cols-[18px_minmax(0,1fr)_14px] items-center gap-x-2.5 px-3.5 py-2.5 transition-colors hover:bg-surface-soft md:grid-cols-[18px_minmax(0,1fr)_220px_68px_14px] [&::-webkit-details-marker]:hidden">
+                        <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_16px] items-center gap-x-2.5 px-3 py-2.5 transition-colors sm:px-3.5 sm:py-3 hover:bg-surface-soft md:grid-cols-[20px_minmax(0,1fr)_262px_88px_16px] [&::-webkit-details-marker]:hidden">
                           <ServiceIcon slug={service.slug} />
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="truncate text-[13.5px] font-medium">{service.name}</span>
+                              <span className="truncate text-[17px] font-medium">{service.name}</span>
                               <StatusPill state={service.health.state} />
                             </div>
-                            <span className="mt-0.5 block truncate text-[11.5px] text-muted">
+                            <span className="mt-0.5 block truncate text-[14px] text-muted">
                               {service.lastCheckAt
                                 ? `Checked ${formatRelativeTime(service.lastCheckAt, now)}`
                                 : 'No checks recorded'}
@@ -223,23 +223,23 @@ export function ServicesExplorer({
                             <UptimeBars bars={service.bars} label={service.name} compact showLabels={false} />
                           </div>
                           <div className="hidden text-right md:block">
-                            <span className="fh-num block text-[12.5px] text-ink/85">
+                            <span className="fh-num block text-[15px] text-ink/85">
                               {formatUptime(service.uptime90.percent)}
                             </span>
-                            <span className="block text-[11px] text-muted">90d</span>
+                            <span className="block text-[14px] text-muted">90d</span>
                           </div>
                           <ChevronDownIcon className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-180" />
                         </summary>
 
                         <div className="border-t border-line bg-surface-soft px-3.5 py-3 md:pl-[44px]">
                           {service.description && (
-                            <p className="text-[12.5px] leading-relaxed text-muted">{service.description}</p>
+                            <p className="text-[15px] leading-relaxed text-muted">{service.description}</p>
                           )}
-                          <p className="mt-1 text-[12px] leading-relaxed text-ink/75">{service.health.detail}</p>
-                          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-muted">
+                          <p className="mt-1 text-[14px] leading-relaxed text-ink/75">{service.health.detail}</p>
+                          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] text-muted">
                             {windows(service).map(({ label, window }) => (
                               <span key={label} className="inline-flex items-baseline gap-1">
-                                <span className="fh-num text-[12.5px] text-ink/85">
+                                <span className="fh-num text-[15px] text-ink/85">
                                   {formatUptime(window.percent)}
                                 </span>
                                 {label}

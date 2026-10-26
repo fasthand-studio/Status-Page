@@ -54,7 +54,7 @@ export default async function AdminMonitorPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/monitors" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
+      <Link href="/admin/monitors" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All monitors
       </Link>
@@ -75,7 +75,7 @@ export default async function AdminMonitorPage({
         description={
           <span className="flex flex-wrap items-center gap-2">
             <MonitorState status={status} />
-            <span className="break-all font-sans text-[12.5px] text-muted">{monitor.url}</span>
+            <span className="break-all font-sans text-[15px] text-muted">{monitor.url}</span>
           </span>
         }
         actions={
@@ -102,20 +102,20 @@ export default async function AdminMonitorPage({
         <aside className="space-y-4">
           <section className={`${adminCardClass} px-3 py-2`}>
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="font-sans text-[13.5px] font-semibold">Recent checks</h2>
+              <h2 className="font-sans text-[17px] font-semibold">Recent checks</h2>
               <Link href="/admin/services" className={linkClass}>
                 Services
               </Link>
             </div>
             {recent.length === 0 ? (
-              <p className="mt-2 text-[11.5px] leading-relaxed text-muted">
+              <p className="mt-2 text-[14px] leading-relaxed text-muted">
                 No checks stored yet. Use “Run check now” once the URL is verified.
               </p>
             ) : (
               <div className="mt-2 overflow-x-auto">
-                <table className="w-full min-w-[420px] text-left text-[12.5px]">
+                <table className="w-full min-w-[520px] text-left text-[15px]">
                   <thead>
-                    <tr className="border-b border-line font-sans text-[11.5px] text-muted">
+                    <tr className="border-b border-line font-sans text-[14px] text-muted">
                       <th className="py-2 pr-2 font-medium">Time</th>
                       <th className="py-2 pr-2 font-medium">Result</th>
                       <th className="py-2 pr-2 font-medium">HTTP</th>
@@ -130,7 +130,7 @@ export default async function AdminMonitorPage({
                         </td>
                         <td className="py-2 pr-2 align-top">
                           <span
-                            className={`font-sans text-[11.5px] ${
+                            className={`font-sans text-[14px] ${
                               check.ok ? 'text-ok' : 'text-bad'
                             }`}
                           >
@@ -154,8 +154,8 @@ export default async function AdminMonitorPage({
                   .filter((check) => check.error || check.body_excerpt)
                   .slice(0, 3)
                   .map((check) => (
-                    <div key={`detail-${check.id}`} className="text-[12.5px] leading-relaxed text-muted">
-                      <span className="font-sans text-[11.5px] text-muted">
+                    <div key={`detail-${check.id}`} className="text-[15px] leading-relaxed text-muted">
+                      <span className="font-sans text-[14px] text-muted">
                         {formatDateTime(check.checked_at)}
                       </span>
                       {check.error ? <p className="text-bad">{check.error}</p> : null}
@@ -169,8 +169,8 @@ export default async function AdminMonitorPage({
           </section>
 
           <section className={`${adminCardClass} px-3 py-2`}>
-            <p className="font-sans text-[11.5px] text-muted">How automation behaves</p>
-            <ul className="mt-2 space-y-2 text-[12.5px] leading-relaxed text-muted">
+            <p className="font-sans text-[14px] text-muted">How automation behaves</p>
+            <ul className="mt-2 space-y-2 text-[15px] leading-relaxed text-muted">
               <li>
                 Opens an incident after <strong className="text-ink/85">{monitor.failure_threshold}</strong> consecutive
                 failures, once no other incident is open for this monitor.

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
 const fieldBase =
-  'w-full border border-line bg-surface px-2.5 text-[13px] text-ink placeholder:text-muted/70 transition-colors focus:border-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+  'w-full border border-line bg-surface px-2.5 text-[15px] text-ink placeholder:text-muted/70 transition-colors focus:border-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
 export const adminInputClass = cn(fieldBase, 'fh-field');
 
@@ -13,9 +13,9 @@ export const adminTextareaClass = cn(
   'fh-field-area min-h-[7rem] py-3 leading-relaxed',
 );
 
-export const adminLabelClass = 'flex flex-wrap items-baseline gap-1.5 text-[12.5px] font-medium text-ink';
+export const adminLabelClass = 'flex flex-wrap items-baseline gap-1.5 text-[15px] font-medium text-ink';
 
-export const adminHintClass = 'mt-1 text-[11.5px] leading-relaxed text-muted';
+export const adminHintClass = 'mt-1 text-[14px] leading-relaxed text-muted';
 
 export const adminCardClass = 'fh-card border border-line bg-surface';
 
@@ -56,7 +56,7 @@ export function Field({
     <div className={cn('space-y-1.5', className)}>
       <label htmlFor={htmlFor} className={adminLabelClass}>
         <span>{label}</span>
-        <span className={cn('text-[11px] font-normal', required ? 'text-ink/70' : 'text-muted')}>
+        <span className={cn('text-[14px] font-normal', required ? 'text-ink/70' : 'text-muted')}>
           {required ? 'Required' : 'Optional'}
         </span>
       </label>
@@ -86,7 +86,7 @@ export function Notice({
     <div
       role={tone === 'bad' ? 'alert' : 'status'}
       className={cn(
-        'fh-r-sm border px-3 py-2 text-[12.5px] leading-relaxed text-ink/80',
+        'fh-r-sm border px-3 py-2 text-[15px] leading-relaxed text-ink/80',
         tones[tone],
         className,
       )}
@@ -108,9 +108,9 @@ export function AdminPageHeader({
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div className="max-w-2xl">
-        <h1 className="text-[20px] font-semibold tracking-[-0.02em] text-ink">{title}</h1>
+        <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink">{title}</h1>
         {description ? (
-          <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted">{description}</p>
         ) : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
@@ -137,11 +137,11 @@ export function StatCard({
   } as const;
   return (
     <div className={cn(adminCardClass, 'px-3 py-2.5')}>
-      <p className="text-[11.5px] text-muted">{label}</p>
-      <p className={cn('fh-num mt-0.5 text-[18px] font-semibold tracking-[-0.02em]', tones[tone])}>
+      <p className="text-[14px] text-muted">{label}</p>
+      <p className={cn('fh-num mt-0.5 text-[20px] font-semibold tracking-[-0.02em]', tones[tone])}>
         {value}
       </p>
-      {detail ? <p className="mt-0.5 text-[11.5px] leading-relaxed text-muted">{detail}</p> : null}
+      {detail ? <p className="mt-0.5 text-[14px] leading-relaxed text-muted">{detail}</p> : null}
     </div>
   );
 }
@@ -201,8 +201,8 @@ export function AdminMaintenanceBadge({ status }: { status: 'scheduled' | 'in_pr
 export function EmptyAdminState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className={cn(adminCardClass, 'border-dashed px-4 py-6 text-center')}>
-      <p className="text-[14px] font-semibold text-ink">{title}</p>
-      {children ? <div className="mt-1 text-[12.5px] leading-relaxed text-muted">{children}</div> : null}
+      <p className="text-[17px] font-semibold text-ink">{title}</p>
+      {children ? <div className="mt-1 text-[15px] leading-relaxed text-muted">{children}</div> : null}
     </div>
   );
 }

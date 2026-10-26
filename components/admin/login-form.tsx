@@ -16,10 +16,10 @@ export function LoginForm() {
       <div className="space-y-1.5">
         <label
           htmlFor="email"
-          className="flex items-baseline gap-2 text-[12.5px] font-medium text-ink"
+          className="flex items-baseline gap-2 text-[15px] font-medium text-ink"
         >
           Email
-          <span className="text-[11.5px] font-normal text-ink/70">
+          <span className="text-[14px] font-normal text-ink/70">
             Required
           </span>
         </label>
@@ -37,10 +37,10 @@ export function LoginForm() {
       <div className="space-y-1.5">
         <label
           htmlFor="password"
-          className="flex items-baseline gap-2 text-[12.5px] font-medium text-ink"
+          className="flex items-baseline gap-2 text-[15px] font-medium text-ink"
         >
           Password
-          <span className="text-[11.5px] font-normal text-ink/70">
+          <span className="text-[14px] font-normal text-ink/70">
             Required
           </span>
         </label>
@@ -58,7 +58,7 @@ export function LoginForm() {
         Sign in
       </SubmitButton>
 
-      <p className="text-[12.5px] leading-relaxed text-muted">
+      <p className="text-[15px] leading-relaxed text-muted">
         Accounts are created in Supabase Authentication and must be granted admin access separately. There is no
         self-service sign-up on this page.
       </p>

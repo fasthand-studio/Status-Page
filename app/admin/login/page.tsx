@@ -36,10 +36,10 @@ export default async function AdminLoginPage({
         <section className="flex flex-col justify-between px-4 py-6 sm:px-6 lg:py-8">
           <div>
             <Brand label="Ops" />
-            <h1 className="mt-6 max-w-md text-[26px] font-semibold leading-[1.12] tracking-[-0.03em]">
+            <h1 className="mt-6 max-w-md text-[32px] font-semibold leading-[1.12] tracking-[-0.03em]">
               The desk behind the status page.
             </h1>
-            <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-muted">
+            <p className="mt-1.5 max-w-md text-[15px] leading-relaxed text-muted">
               Publish incidents in Markdown, resolve them with a timeline, pause a monitor, or run a
               check on demand. Every public number comes from stored check history — this panel does
               not invent uptime.
@@ -54,8 +54,8 @@ export default async function AdminLoginPage({
               ['Access', 'Sign-in limited to the admin allowlist.'],
             ].map(([headline, copy]) => (
               <div key={headline} className="fh-r-sm border border-line bg-paper/60 p-3">
-                <p className="text-[12.5px] font-semibold">{headline}</p>
-                <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted">{copy}</p>
+                <p className="text-[15px] font-semibold">{headline}</p>
+                <p className="mt-0.5 text-[15px] leading-relaxed text-muted">{copy}</p>
               </div>
             ))}
           </div>
@@ -65,7 +65,7 @@ export default async function AdminLoginPage({
           <div className="w-full lg:mx-auto lg:max-w-sm">
             <div className="mb-4 flex items-center gap-2">
               <LockIcon className="h-4 w-4" />
-              <h2 className="text-[16px] font-semibold">Admin sign in</h2>
+              <h2 className="text-[18px] font-semibold">Admin sign in</h2>
             </div>
 
             {!isSupabaseConfigured ? (
@@ -76,12 +76,12 @@ export default async function AdminLoginPage({
                 </Notice>
                 <div className={`${adminCardClass} space-y-2 px-3 py-2`}>
                   <p className="font-medium">Environment variables needed</p>
-                  <ul className="space-y-1 text-[12.5px] leading-relaxed text-muted">
+                  <ul className="space-y-1 text-[15px] leading-relaxed text-muted">
                     <li>NEXT_PUBLIC_SUPABASE_URL</li>
                     <li>NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
                     <li>SUPABASE_SERVICE_ROLE_KEY</li>
                   </ul>
-                  <p className="text-[12.5px] leading-relaxed text-muted">
+                  <p className="text-[15px] leading-relaxed text-muted">
                     Apply both migrations in the Supabase SQL editor, create the admin user in
                     Authentication, then run{' '}
                     <span className="font-sans text-ink">npm run grant-admin -- you@example.com</span>.
@@ -94,10 +94,10 @@ export default async function AdminLoginPage({
                   Signed in as <span className="font-sans">{context.email}</span>, but this account is
                   not on the admin allowlist.
                 </Notice>
-                <p className="text-[11.5px] leading-relaxed text-muted">
+                <p className="text-[14px] leading-relaxed text-muted">
                   An existing admin can grant access from the repository:
                 </p>
-                <pre className="overflow-x-auto fh-r-sm border border-line bg-paper px-3 py-2 text-[12.5px]">
+                <pre className="overflow-x-auto fh-r-sm border border-line bg-paper px-3 py-2 text-[15px]">
                   npm run grant-admin -- {context.email}
                 </pre>
                 <form action={signOutAction}>
@@ -114,7 +114,7 @@ export default async function AdminLoginPage({
                   </div>
                 ) : null}
                 <LoginForm />
-                <p className="mt-4 text-[12.5px] leading-relaxed text-muted">
+                <p className="mt-4 text-[15px] leading-relaxed text-muted">
                   Looking for the public page?{' '}
                   <Link href="/" className={linkClass}>
                     Return to status

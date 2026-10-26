@@ -79,48 +79,48 @@ export default async function AdminMonitorsPage({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="font-sans text-[13.5px] font-semibold text-ink">{monitor.name}</h2>
+                      <h2 className="font-sans text-[17px] font-semibold text-ink">{monitor.name}</h2>
                       <MonitorState status={monitor.status} />
                       {!monitor.enabled ? (
-                        <span className="font-sans text-[11.5px] text-muted">Paused</span>
+                        <span className="font-sans text-[14px] text-muted">Paused</span>
                       ) : null}
                     </div>
-                    <p className="mt-1 break-all font-sans text-[12.5px] text-muted">{monitor.url}</p>
+                    <p className="mt-1 break-all font-sans text-[15px] text-muted">{monitor.url}</p>
                   </div>
-                  <Link href={`/admin/monitors/${monitor.id}`} className={`${linkClass} text-[12.5px]`}>
+                  <Link href={`/admin/monitors/${monitor.id}`} className={`${linkClass} text-[15px]`}>
                     Open
                   </Link>
                 </div>
 
                 <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <div>
-                    <dt className="font-sans text-[11.5px] text-muted">Last check</dt>
-                    <dd className="mt-0.5 text-[12.5px] text-muted">
+                    <dt className="font-sans text-[14px] text-muted">Last check</dt>
+                    <dd className="mt-0.5 text-[15px] text-muted">
                       {monitor.status?.checked_at ? formatRelativeTime(monitor.status.checked_at) : 'Never'}
                     </dd>
                   </div>
                   <div>
-                    <dt className="font-sans text-[11.5px] text-muted">HTTP / time</dt>
-                    <dd className="mt-0.5 font-sans text-[12.5px] text-muted">
+                    <dt className="font-sans text-[14px] text-muted">HTTP / time</dt>
+                    <dd className="mt-0.5 font-sans text-[15px] text-muted">
                       {monitor.latest
                         ? `${monitor.latest.status_code ?? '—'} · ${monitor.latest.response_time_ms ?? '—'} ms`
                         : '—'}
                     </dd>
                   </div>
                   <div>
-                    <dt className="font-sans text-[11.5px] text-muted">Cadence</dt>
-                    <dd className="mt-0.5 text-[12.5px] text-muted">{Math.round(monitor.check_interval_seconds / 60)} min</dd>
+                    <dt className="font-sans text-[14px] text-muted">Cadence</dt>
+                    <dd className="mt-0.5 text-[15px] text-muted">{Math.round(monitor.check_interval_seconds / 60)} min</dd>
                   </div>
                   <div>
-                    <dt className="font-sans text-[11.5px] text-muted">Thresholds</dt>
-                    <dd className="mt-0.5 text-[12.5px] text-muted">
+                    <dt className="font-sans text-[14px] text-muted">Thresholds</dt>
+                    <dd className="mt-0.5 text-[15px] text-muted">
                       {monitor.failure_threshold} fail / {monitor.recovery_threshold} pass
                     </dd>
                   </div>
                 </dl>
 
                 {stale ? (
-                  <p className="mt-2 text-[12.5px] leading-relaxed text-warn">
+                  <p className="mt-2 text-[15px] leading-relaxed text-warn">
                     The last check is older than the expected window. The public page shows this service as unknown.
                   </p>
                 ) : null}
@@ -138,7 +138,7 @@ export default async function AdminMonitorsPage({
                     label={monitor.enabled ? 'Pause monitor' : 'Resume monitor'}
                     pendingLabel="Working…"
                   />
-                  <Link href={`/admin/monitors/${monitor.id}`} className={`${secondaryButtonClass} px-3 py-1.5 text-[12.5px]`}>
+                  <Link href={`/admin/monitors/${monitor.id}`} className={`${secondaryButtonClass} px-3 py-1.5 text-[15px]`}>
                     <PlayIcon className="h-3 w-3" />
                     Check history
                   </Link>

@@ -156,7 +156,7 @@ export default async function HomePage() {
           ) : (
             <div className="flex items-center gap-2.5 fh-card border border-line bg-surface px-3.5 py-2.5">
               <CheckIcon className="h-4 w-4 shrink-0 text-ok" />
-              <p className="min-w-0 text-[12.5px] text-muted">
+              <p className="min-w-0 text-[15px] text-muted">
                 <span className="font-medium text-ink">No incidents reported.</span>{' '}
                 {snapshot.recentIncidents[0]
                   ? `Last incident resolved ${formatRelativeTime(snapshot.recentIncidents[0].resolved_at, now)}.`
@@ -176,11 +176,11 @@ export default async function HomePage() {
               return (
                 <div key={group.id} className="overflow-hidden fh-panel border border-line bg-surface">
                   <div className="flex items-center gap-2 border-b border-line bg-surface-soft px-3.5 py-2">
-                    <h3 className="text-[12.5px] font-semibold">{group.name}</h3>
+                    <h3 className="text-[15px] font-semibold">{group.name}</h3>
                     <StatusPill state={groupWorstHealth(groupHealths)} />
                     <Link
                       href={`/services#group-${group.slug}`}
-                      className="ml-auto text-[11.5px] text-primary hover:underline"
+                      className="ml-auto text-[14px] text-primary hover:underline"
                     >
                       Details
                     </Link>
@@ -229,7 +229,7 @@ export default async function HomePage() {
           ) : (
             <div className="flex items-center gap-2.5 fh-card border border-line bg-surface px-3.5 py-2.5">
               <WrenchIcon className="h-4 w-4 shrink-0 text-muted" />
-              <p className="text-[12.5px] text-muted">
+              <p className="text-[15px] text-muted">
                 <span className="font-medium text-ink">No planned maintenance.</span> New windows are
                 announced here before work starts.
               </p>

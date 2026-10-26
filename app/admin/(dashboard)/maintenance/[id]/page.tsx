@@ -50,7 +50,7 @@ export default async function AdminMaintenanceItemPage({
     <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href="/admin/maintenance"
-        className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All maintenance
@@ -64,14 +64,14 @@ export default async function AdminMaintenanceItemPage({
         description={
           <span className="flex flex-wrap items-center gap-2">
             <AdminMaintenanceBadge status={window.status} />
-            <span className="text-[12.5px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</span>
+            <span className="text-[15px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</span>
           </span>
         }
         actions={
           <Link
             href="/maintenance"
             target="_blank"
-            className="inline-flex items-center gap-1.5 fh-round border border-line px-3 py-1.5 text-[12.5px] text-ink/85 transition hover:border-ink/25 hover:bg-ink/5"
+            className="fh-btn border border-line bg-surface text-[15px] font-medium text-ink/85 hover:bg-ink/5"
           >
             Public page
             <ArrowUpRightIcon className="h-3.5 w-3.5" />
@@ -89,8 +89,8 @@ export default async function AdminMaintenanceItemPage({
 
         <aside className="space-y-3">
           <div className={`${adminCardClass} px-3 py-2`}>
-            <p className="font-sans text-[11.5px] text-muted">Record</p>
-            <dl className="mt-2 space-y-2 text-[12.5px]">
+            <p className="font-sans text-[14px] text-muted">Record</p>
+            <dl className="mt-2 space-y-2 text-[15px]">
               <div className="flex justify-between gap-3">
                 <dt className="text-muted">Created</dt>
                 <dd className="text-right text-muted">{formatDateTime(window.created_at)}</dd>
@@ -101,14 +101,14 @@ export default async function AdminMaintenanceItemPage({
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-muted">Window ID</dt>
-                <dd className="truncate font-sans text-[11.5px] text-muted">{window.id}</dd>
+                <dd className="truncate font-sans text-[14px] text-muted">{window.id}</dd>
               </div>
             </dl>
           </div>
 
           <div className={`${adminCardClass} px-3 py-2`}>
-            <p className="font-sans text-[11.5px] text-muted">Status meaning</p>
-            <ul className="mt-2 space-y-2 text-[12.5px] leading-relaxed text-muted">
+            <p className="font-sans text-[14px] text-muted">Status meaning</p>
+            <ul className="mt-2 space-y-2 text-[15px] leading-relaxed text-muted">
               <li>
                 <strong className="text-ink/85">Scheduled</strong> shows ahead of time and marks services as
                 maintenance while the window is open.
@@ -122,7 +122,7 @@ export default async function AdminMaintenanceItemPage({
                 stop affecting service health but stay in the archive.
               </li>
             </ul>
-            <Link href="/maintenance" className={`${linkClass} mt-2 inline-block text-[12.5px]`}>
+            <Link href="/maintenance" className={`${linkClass} mt-2 inline-block text-[15px]`}>
               View public maintenance
             </Link>
           </div>

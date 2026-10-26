@@ -45,7 +45,7 @@ export default async function NewIncidentPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/admin/incidents" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
+      <Link href="/admin/incidents" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All incidents
       </Link>
@@ -113,7 +113,7 @@ export default async function NewIncidentPage() {
         />
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <p className="text-[12.5px] text-muted">
+          <p className="text-[15px] text-muted">
             Resolved incidents still appear under{' '}
             <Link href="/history" className={linkClass}>
               history

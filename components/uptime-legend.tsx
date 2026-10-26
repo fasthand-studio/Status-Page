@@ -8,7 +8,7 @@ const LEGEND = [
 
 export function UptimeLegend({ className }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted ${className ?? ''}`}>
+    <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[14px] text-muted ${className ?? ''}`}>
       {LEGEND.map((item) => (
         <span key={item.label} className="inline-flex items-center gap-1.5">
           <span className={`h-2 w-2 fh-bar ${item.className}`} />

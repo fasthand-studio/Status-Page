@@ -9,7 +9,7 @@ export function SiteHeader() {
         <div className="hidden h-full md:block">
           <SiteNav />
         </div>
-        <span className="ml-auto hidden text-[12px] text-muted md:block">All times UTC</span>
+        <span className="ml-auto hidden text-[14px] text-muted md:block">All times UTC</span>
       </div>
       <div className="border-t border-line md:hidden">
         <div className="mx-auto max-w-[1100px] px-2">

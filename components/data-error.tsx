@@ -13,8 +13,8 @@ export function DataError({
       <div className="flex items-start gap-2.5">
         <AlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-bad" />
         <div>
-          <p className="text-[14px] font-semibold">{title}</p>
-          <p className="mt-0.5 max-w-xl text-[12px] leading-relaxed text-ink/70">
+          <p className="text-[17px] font-semibold">{title}</p>
+          <p className="mt-0.5 max-w-xl text-[14px] leading-relaxed text-ink/70">
             {description ??
               'The monitoring database did not answer. Nothing is being assumed healthy while data is missing.'}
           </p>

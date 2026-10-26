@@ -28,7 +28,7 @@ export default async function NewMaintenancePage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <Link
         href="/admin/maintenance"
-        className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All maintenance

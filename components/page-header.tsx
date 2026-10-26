@@ -19,12 +19,12 @@ export function PageHeader({
       )}
     >
       <div className="min-w-0 max-w-2xl">
-        <h1 className="text-[22px] font-semibold leading-tight tracking-[-0.015em]">{title}</h1>
+        <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.015em]">{title}</h1>
         {description && (
-          <p className="mt-1 text-[13px] leading-relaxed text-muted">{description}</p>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted">{description}</p>
         )}
       </div>
-      {aside && <div className="shrink-0 text-[12px] text-muted">{aside}</div>}
+      {aside && <div className="shrink-0 text-[14px] text-muted">{aside}</div>}
     </div>
   );
 }

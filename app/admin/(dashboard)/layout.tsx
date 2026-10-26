@@ -25,10 +25,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
           <div className="mt-auto hidden space-y-2.5 lg:block">
             <div className="fh-r-sm border border-line bg-surface px-2.5 py-2">
-              <p className="text-[11px] text-muted">Signed in</p>
-              <p className="mt-0.5 truncate text-[12.5px]">{context.email}</p>
+              <p className="text-[14px] text-muted">Signed in</p>
+              <p className="mt-0.5 truncate text-[15px]">{context.email}</p>
             </div>
-            <p className="px-1 text-[11.5px] leading-relaxed text-muted">
+            <p className="px-1 text-[14px] leading-relaxed text-muted">
               Public numbers come from stored checks. Never publish an uptime figure you cannot point to
               in check_results.
             </p>
@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2 lg:px-6">
-            <p className="text-[12.5px] text-muted">FastHand ops desk</p>
+            <p className="text-[15px] text-muted">FastHand ops desk</p>
             <div className="flex items-center gap-2">
               <Link href="/" target="_blank" className={secondaryButtonClass}>
                 Public page

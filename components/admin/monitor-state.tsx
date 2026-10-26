@@ -27,8 +27,8 @@ export function MonitorState({ status, className }: { status: MonitorStatus | nu
   const copy = COPY[key];
   const Icon = copy.icon;
   return (
-    <span className={cn('inline-flex items-center gap-1.5 text-[12.5px] font-medium', copy.text, className)}>
-      <Icon aria-hidden="true" strokeWidth={2.3} className="h-3 w-3 shrink-0" />
+    <span className={cn('inline-flex items-center gap-1.5 text-[15px] font-medium', copy.text, className)}>
+      <Icon aria-hidden="true" strokeWidth={2.3} className="h-3.5 w-3.5 shrink-0" />
       {copy.label}
     </span>
   );

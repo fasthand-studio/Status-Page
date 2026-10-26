@@ -26,7 +26,7 @@ export default async function NewServicePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/admin/services" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
+      <Link href="/admin/services" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All services
       </Link>

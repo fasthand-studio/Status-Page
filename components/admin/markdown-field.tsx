@@ -35,7 +35,7 @@ export function MarkdownField({
           <span>{label}</span>
           <span
             className={cn(
-              'font-sans text-[11.5px] font-semibold',
+              'font-sans text-[14px] font-semibold',
               required ? 'text-ink' : 'text-muted',
             )}
           >
@@ -80,7 +80,7 @@ export function MarkdownField({
           {value.trim() ? (
             <Markdown>{value}</Markdown>
           ) : (
-            <p className="text-[11.5px] text-muted">Nothing to preview yet.</p>
+            <p className="text-[14px] text-muted">Nothing to preview yet.</p>
           )}
         </div>
       ) : null}

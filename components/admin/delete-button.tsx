@@ -34,7 +34,7 @@ export function DeleteButton({
       {Object.entries(fields).map(([key, value]) => (
         <input key={key} type="hidden" name={key} value={value} />
       ))}
-      <span aria-live="polite" className="max-w-[22rem] text-[12.5px] leading-tight text-bad">
+      <span aria-live="polite" className="max-w-[22rem] text-[15px] leading-tight text-bad">
         {state.error ?? description}
       </span>
       <button type="submit" disabled={pending} aria-busy={pending} className={dangerSolidButtonClass}>

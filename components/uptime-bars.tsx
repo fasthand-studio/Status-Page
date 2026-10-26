@@ -39,7 +39,7 @@ export function UptimeBars({
       <div className="relative" onMouseLeave={() => setHovered(null)}>
         {active && (
           <div
-            className="pointer-events-none absolute -top-10 z-20 -translate-x-1/2 whitespace-nowrap rounded-[4px] border border-line bg-surface px-2 py-1 text-[11px] leading-tight text-ink shadow-sm"
+            className="pointer-events-none absolute -top-10 z-20 -translate-x-1/2 whitespace-nowrap fh-r-sm border border-line bg-surface px-2 py-1 text-[14px] leading-tight text-ink"
             style={{ left: `${left}%` }}
             role="status"
           >
@@ -54,7 +54,7 @@ export function UptimeBars({
         <div
           role="img"
           aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days, ${totalChecks} checks recorded`}
-          className={cn('flex items-stretch gap-[2px]', compact ? 'h-4' : 'h-[26px]')}
+          className={cn(compact ? 'fh-bars-compact' : 'fh-bars-wide')}
         >
           {bars.map((bar, index) => (
             <div
@@ -71,7 +71,7 @@ export function UptimeBars({
       </div>
 
       {showLabels && (
-        <div className="mt-1 flex items-center justify-between text-[11px] text-muted">
+        <div className="mt-1 flex items-center justify-between text-[14px] text-muted">
           <span>{bars.length} days ago</span>
           <span>Today</span>
         </div>

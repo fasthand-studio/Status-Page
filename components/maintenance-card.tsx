@@ -18,18 +18,18 @@ export function MaintenanceCard({
     <article className="fh-card border border-line bg-surface px-4 py-3">
       <div className="flex flex-wrap items-center gap-1.5">
         <span className={cn('fh-pill font-medium', MAINTENANCE_PHASE_TONE[current.key])}>{current.label}</span>
-        <span className="ml-auto text-[11px] text-muted">{current.note}</span>
+        <span className="ml-auto text-[14px] text-muted">{current.note}</span>
       </div>
 
-      <h3 className="mt-1.5 text-[14px] font-semibold leading-snug">{window.title}</h3>
-      <p className="fh-num mt-0.5 text-[11.5px] text-muted">
+      <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{window.title}</h3>
+      <p className="fh-num mt-0.5 text-[14px] text-muted">
         {formatWindow(window.scheduled_start, window.scheduled_end)}
       </p>
 
       {affectedServices.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {affectedServices.map((name) => (
-            <span key={name} className="fh-r-xs border border-line px-1.5 py-0.5 text-[11px] text-muted">
+            <span key={name} className="fh-pill border border-line text-[14px] text-muted">
               {name}
             </span>
           ))}

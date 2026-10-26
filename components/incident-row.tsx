@@ -18,17 +18,17 @@ export function IncidentRow({
   return (
     <Link
       href={`/incidents/${incident.id}`}
-      className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-line px-3.5 py-2.5 transition-colors last:border-b-0 hover:bg-surface-soft"
+      className="grid grid-cols-[92px_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-line px-3 py-2.5 transition-colors sm:px-3.5 sm:py-3 transition-colors last:border-b-0 hover:bg-surface-soft"
     >
       <time
         dateTime={incident.resolved_at ?? incident.started_at}
-        className="fh-num text-[11.5px] text-muted"
+        className="fh-num text-[14px] text-muted"
       >
         {formatShortDate(incident.resolved_at ?? incident.started_at)}
       </time>
       <div className="min-w-0">
-        <p className="truncate text-[13px] font-medium">{incident.title}</p>
-        <p className="truncate text-[11.5px] text-muted">
+        <p className="truncate text-[15px] font-medium">{incident.title}</p>
+        <p className="truncate text-[14px] text-muted">
           {affectedServices.length > 0 ? affectedServices.join(' · ') : 'No services linked'}
           {incident.resolved_at ? '' : ' · ongoing'}
         </p>
@@ -37,7 +37,7 @@ export function IncidentRow({
         <span className="hidden sm:inline-flex">
           <ImpactBadge impact={incident.impact} />
         </span>
-        <span className="fh-num w-14 text-right text-[11.5px] text-muted">
+        <span className="fh-num w-[76px] text-right text-[14px] text-muted">
           {incident.resolved_at ? formatDuration(duration) : '—'}
         </span>
       </div>

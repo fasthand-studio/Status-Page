@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
@@ -14,13 +15,22 @@ const ITEMS = [
 
 export function SiteNav({ compact = false }: { compact?: boolean }) {
   const pathname = usePathname();
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!compact || !nav || !active) return;
+    nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2;
+  }, [compact, pathname]);
 
   return (
     <nav
+      ref={navRef}
       aria-label="Status sections"
       className={cn(
-        'flex items-stretch',
-        compact ? 'gap-0.5 overflow-x-auto no-scrollbar' : 'h-full gap-5',
+        'flex items-center',
+        compact ? 'gap-1 overflow-x-auto no-scrollbar' : 'gap-1.5',
       )}
     >
       {ITEMS.map((item) => {
@@ -31,20 +41,13 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'relative flex shrink-0 items-center whitespace-nowrap font-medium transition-colors',
-              compact ? 'h-9 px-2 text-[12.5px]' : 'h-12 text-[13px]',
-              active ? 'text-primary' : 'text-muted hover:text-ink',
+              'fh-pill-lg shrink-0 justify-center transition-colors',
+              active
+                ? 'bg-primary/[0.08] text-primary'
+                : 'bg-transparent text-muted hover:bg-surface-soft hover:text-ink',
             )}
           >
             {item.label}
-            <span
-              className={cn(
-                'absolute inset-x-0 bottom-0 h-[2px] transition-colors',
-                compact && 'inset-x-1.5',
-                active ? 'bg-primary' : 'bg-transparent',
-              )}
-              aria-hidden="true"
-            />
           </Link>
         );
       })}

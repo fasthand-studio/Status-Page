@@ -63,8 +63,8 @@ export default async function AdminMaintenancePage({
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-sans text-[13.5px] font-semibold">Upcoming & active</h2>
-          <p className="font-sans text-[11.5px] text-muted">{upcoming.length}</p>
+          <h2 className="font-sans text-[17px] font-semibold">Upcoming & active</h2>
+          <p className="font-sans text-[14px] text-muted">{upcoming.length}</p>
         </div>
         {upcoming.length === 0 ? (
           <Notice tone="info">No upcoming maintenance windows.</Notice>
@@ -74,12 +74,12 @@ export default async function AdminMaintenancePage({
               <article key={window.id} className={`${adminCardClass} px-3 py-2`}>
                 <div className="flex flex-wrap items-center gap-2">
                   <AdminMaintenanceBadge status={window.status} />
-                  <span className="text-[12.5px] text-muted">{window.maintenance_services.length} services</span>
+                  <span className="text-[15px] text-muted">{window.maintenance_services.length} services</span>
                 </div>
                 <p className="mt-2 font-medium text-ink">{window.title}</p>
-                <p className="mt-1 text-[12.5px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</p>
+                <p className="mt-1 text-[15px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</p>
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-                  <Link href={`/admin/maintenance/${window.id}`} className={`${linkClass} text-[12.5px]`}>
+                  <Link href={`/admin/maintenance/${window.id}`} className={`${linkClass} text-[15px]`}>
                     Open window
                   </Link>
                   <DeleteButton
@@ -96,8 +96,8 @@ export default async function AdminMaintenancePage({
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-sans text-[13.5px] font-semibold">Archive</h2>
-          <p className="font-sans text-[11.5px] text-muted">{past.length}</p>
+          <h2 className="font-sans text-[17px] font-semibold">Archive</h2>
+          <p className="font-sans text-[14px] text-muted">{past.length}</p>
         </div>
         {past.length === 0 ? (
           <EmptyAdminState title="No past maintenance">
@@ -105,9 +105,9 @@ export default async function AdminMaintenancePage({
           </EmptyAdminState>
         ) : (
           <div className={`${adminCardClass} overflow-x-auto`}>
-            <table className="w-full min-w-[760px] text-left text-[12.5px]">
+            <table className="w-full min-w-[900px] text-left text-[15px]">
               <thead>
-                <tr className="border-b border-line font-sans text-[11.5px] text-muted">
+                <tr className="border-b border-line font-sans text-[14px] text-muted">
                   <th className="px-3 py-2 font-medium">Window</th>
                   <th className="px-3 py-2 font-medium">Status</th>
                   <th className="px-3 py-2 font-medium">Scheduled</th>
@@ -122,10 +122,10 @@ export default async function AdminMaintenancePage({
                     <td className="px-3 py-2">
                       <AdminMaintenanceBadge status={window.status} />
                     </td>
-                    <td className="px-3 py-2 text-[12.5px] text-muted">
+                    <td className="px-3 py-2 text-[15px] text-muted">
                       {formatWindow(window.scheduled_start, window.scheduled_end)}
                     </td>
-                    <td className="px-3 py-2 font-sans text-[12.5px] text-muted">
+                    <td className="px-3 py-2 font-sans text-[15px] text-muted">
                       {window.maintenance_services.length}
                     </td>
                     <td className="px-3 py-2">
