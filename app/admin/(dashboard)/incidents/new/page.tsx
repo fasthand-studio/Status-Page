@@ -3,27 +3,11 @@ import Link from 'next/link';
 import { requireAdminContext } from '@/lib/auth';
 import { loadAdminServices } from '@/lib/admin-data';
 import { createIncidentAction } from '@/app/admin/actions';
-import { ActionForm } from '@/components/admin/action-form';
-import { MarkdownField } from '@/components/admin/markdown-field';
-import { ServiceCheckboxes } from '@/components/admin/service-checkboxes';
-import { SubmitButton } from '@/components/admin/submit-button';
-import {
-  AdminPageHeader,
-  adminCardClass,
-  adminInputClass,
-  adminSelectClass,
-  Field,
-  linkClass,
-  Notice,
-} from '@/components/admin/ui';
+import { IncidentComposer } from '@/components/admin/incident-composer';
+import { AdminPageHeader, linkClass, Notice } from '@/components/admin/ui';
 import { ArrowLeftIcon } from '@/components/icons';
-import {
-  formatUtcInput,
-  INCIDENT_IMPACT_LABELS,
-  INCIDENT_IMPACTS,
-  INCIDENT_STATUS_LABELS,
-  INCIDENT_STATUSES,
-} from '@/lib/validation';
+import { isWriterConfigured } from '@/lib/incident-writer';
+import { formatUtcInput } from '@/lib/validation';
 
 export const metadata: Metadata = { title: 'New incident — FastHand Ops' };
 
@@ -60,69 +44,17 @@ export default async function NewIncidentPage() {
         incidents after sustained failures; you do not need to duplicate them.
       </Notice>
 
-      <ActionForm action={createIncidentAction} className={`${adminCardClass} px-3 py-2 sm:p-4`}>
-        <Field label="Title" htmlFor="title" required hint="Short and factual, e.g. “Seller panel login is slow”.">
-          <input id="title" name="title" required maxLength={140} className={adminInputClass} />
-        </Field>
+      <IncidentComposer
+        action={createIncidentAction}
+        services={services}
+        startedAt={now}
+        writerEnabled={isWriterConfigured()}
+      />
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Impact" htmlFor="impact" required hint="Drives the public severity label.">
-            <select id="impact" name="impact" defaultValue="major" className={adminSelectClass}>
-              {INCIDENT_IMPACTS.map((impact) => (
-                <option key={impact} value={impact}>
-                  {INCIDENT_IMPACT_LABELS[impact]}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Status" htmlFor="status" required>
-            <select id="status" name="status" defaultValue="investigating" className={adminSelectClass}>
-              {INCIDENT_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {INCIDENT_STATUS_LABELS[status]}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-
-        <Field
-          label="Started at (UTC)"
-          htmlFor="started_at"
-          required
-          hint="Entered in UTC. The public timeline uses this time."
-        >
-          <input
-            id="started_at"
-            name="started_at"
-            type="datetime-local"
-            defaultValue={now}
-            required
-            className={adminInputClass}
-          />
-        </Field>
-
-        <ServiceCheckboxes services={services} />
-
-        <MarkdownField
-          name="body"
-          label="First update"
-          required
-          placeholder="We are investigating reports that…"
-          hint="This becomes the opening entry in the public timeline. Markdown is supported; raw HTML is shown as text."
-        />
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <p className="text-[15px] text-muted">
-            Resolved incidents still appear under{' '}
-            <Link href="/history" className={linkClass}>
-              history
-            </Link>
-            .
-          </p>
-          <SubmitButton pendingLabel="Publishing…">Publish incident</SubmitButton>
-        </div>
-      </ActionForm>
+      <p className="text-[14px] leading-relaxed text-muted">
+        The draft writer turns what you type into customer-facing wording. It never sees check data, so anything it
+        does not know it must not claim.
+      </p>
     </div>
   );
 }

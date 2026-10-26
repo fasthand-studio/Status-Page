@@ -7,7 +7,7 @@ import { postIncidentUpdateAction, updateIncidentAction } from '@/app/admin/acti
 import { formatDateTime, formatRelativeTime } from '@/lib/format';
 import { isUuid } from '@/lib/validation';
 import { ActionForm } from '@/components/admin/action-form';
-import { MarkdownField } from '@/components/admin/markdown-field';
+import { IncidentUpdateForm } from '@/components/admin/incident-update-form';
 import { ServiceCheckboxes } from '@/components/admin/service-checkboxes';
 import { SubmitButton } from '@/components/admin/submit-button';
 import {
@@ -23,12 +23,11 @@ import {
 } from '@/components/admin/ui';
 import { ArrowLeftIcon, ArrowUpRightIcon } from '@/components/icons';
 import { Markdown } from '@/components/markdown';
+import { isWriterConfigured } from '@/lib/incident-writer';
 import {
   formatUtcInput,
   INCIDENT_IMPACT_LABELS,
   INCIDENT_IMPACTS,
-  INCIDENT_STATUS_LABELS,
-  INCIDENT_STATUSES,
 } from '@/lib/validation';
 
 export const metadata: Metadata = { title: 'Incident — FastHand Ops' };
@@ -121,44 +120,13 @@ export default async function AdminIncidentPage({
             </p>
 
             <div className="mt-4">
-              <ActionForm action={postIncidentUpdateAction}>
-                <input type="hidden" name="incident_id" value={incident.id} />
-
-                <div className="grid gap-3 sm:grid-cols-[minmax(0,220px)_1fr] sm:items-start">
-                  <Field label="New status" htmlFor="update_status" required>
-                    <select
-                      id="update_status"
-                      name="status"
-                      defaultValue={incident.status}
-                      className={adminSelectClass}
-                    >
-                      {INCIDENT_STATUSES.map((status) => (
-                        <option key={status} value={status}>
-                          {INCIDENT_STATUS_LABELS[status]}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                  <MarkdownField
-                    name="body"
-                    label="Update"
-                    required
-                    placeholder={
-                      incident.status === 'resolved'
-                        ? 'This incident is resolved. The service has stayed healthy since…'
-                        : 'We have identified the cause and are…'
-                    }
-                    rows={6}
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                  <p className="text-[15px] text-muted">
-                    Choosing a non-resolved status on a resolved incident reopens it.
-                  </p>
-                  <SubmitButton pendingLabel="Publishing…">Publish update</SubmitButton>
-                </div>
-              </ActionForm>
+              <IncidentUpdateForm
+                action={postIncidentUpdateAction}
+                incidentId={incident.id}
+                incidentTitle={incident.title}
+                currentStatus={incident.status}
+                writerEnabled={isWriterConfigured()}
+              />
             </div>
           </section>
 

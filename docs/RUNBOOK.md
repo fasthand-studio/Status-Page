@@ -9,7 +9,9 @@ Operational steps for the FastHand status page. Keep this short enough to use wh
    **Investigating** unless you already know more.
 3. Tick the services that are actually affected. Unticked services will not inherit the incident's health.
 4. Write the first update in Markdown: what customers see, what you know, what you do not know yet, and the
-   next update time if you can commit to one.
+   next update time if you can commit to one. In a hurry, type those facts into **What is the issue?** and
+   press **Draft the copy** — it fills the fields, nothing publishes until you do, and it has never seen a
+   check result, so correct anything it guessed.
 5. Publish. It appears on the public page immediately.
 6. Post further updates as the status changes. Each update carries its own status; publishing **Resolved**
    sets `resolved_at` and closes the incident.
@@ -32,11 +34,24 @@ Do not create a manual incident to duplicate an automated one. Automated inciden
 That is the honest state, not a bug.
 
 1. `/admin` → check the **Runner** panel and the warning banner.
-2. GitHub → Actions → **Status checks** → recent runs. Look for a red run and the failing step.
-3. Confirm the repository secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` still exist and are
-   correct (service-role keys can be rotated).
-4. Run `npm run checks` locally against the same Supabase project to isolate runner vs. workflow.
-5. Do not publish a green state manually. Fix the checks and let fresh results replace the grey bars.
+2. Supabase → SQL editor: is the job still registered and firing?
+
+   ```sql
+   select jobname, jobstatus from cron.job;
+   select start_time, status, return_message
+   from cron.job_run_details
+   where jobname = 'fasthand-status-checks'
+   order by start_time desc
+   limit 5;
+   ```
+
+3. If the job is missing, re-run the `cron.schedule` block in the README. If it is firing but the runs are
+   not landing, the deployment is unreachable or the bearer key rotated — `curl -X POST` the
+   `/api/checks/run` endpoint with the service-role key and read the response.
+4. Confirm `SUPABASE_SERVICE_ROLE_KEY` still matches in Vercel and in **Vault** (`status_service_key`).
+5. Run `npm run checks` locally against the same Supabase project to prove the monitors and the database are
+   fine and only the scheduler is broken.
+6. Do not publish a green state manually. Fix the checks and let fresh results replace the grey bars.
 
 ## If a monitor is failing
 
@@ -69,7 +84,8 @@ Requires `.env.local` with `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) and
 ## Secret rotation
 
 1. Supabase → Project Settings → API → rotate the service-role key.
-2. Update the GitHub Actions secret and the Vercel environment variable.
+2. Update the Vercel environment variable and the `status_service_key` secret in Supabase Vault — the cron
+   job reads the key from Vault, so a stale copy there silently stops every scheduled check.
 3. Redeploy Vercel if the running deployment needs the new key immediately.
 4. Revoke old admin accounts by email; deleting the `admin_users` row is immediate, deleting the auth user
    is optional.

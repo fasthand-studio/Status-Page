@@ -11,6 +11,8 @@ export function MarkdownField({
   name,
   label,
   defaultValue = '',
+  value,
+  onValueChange,
   placeholder = 'What is happening, what changed, and what customers should do.',
   hint,
   required = false,
@@ -19,6 +21,8 @@ export function MarkdownField({
   name: string;
   label: string;
   defaultValue?: string;
+  value?: string;
+  onValueChange?: (next: string) => void;
   placeholder?: string;
   hint?: string;
   required?: boolean;
@@ -26,7 +30,13 @@ export function MarkdownField({
 }) {
   const id = useId();
   const [tab, setTab] = useState<Tab>('write');
-  const [value, setValue] = useState(defaultValue);
+  const [internal, setInternal] = useState(defaultValue);
+  const current = value ?? internal;
+
+  function update(next: string) {
+    onValueChange?.(next);
+    if (value === undefined) setInternal(next);
+  }
 
   return (
     <div className="space-y-1.5">
@@ -69,16 +79,16 @@ export function MarkdownField({
         id={id}
         name={name}
         rows={rows}
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
+        value={current}
+        onChange={(event) => update(event.target.value)}
         placeholder={placeholder}
         className={cn(adminTextareaClass, tab === 'preview' && 'hidden')}
       />
 
       {tab === 'preview' ? (
         <div className="min-h-[7rem] fh-r-sm border border-line bg-paper px-3 py-2">
-          {value.trim() ? (
-            <Markdown>{value}</Markdown>
+          {current.trim() ? (
+            <Markdown>{current}</Markdown>
           ) : (
             <p className="text-[14px] text-muted">Nothing to preview yet.</p>
           )}

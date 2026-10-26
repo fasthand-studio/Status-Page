@@ -11,7 +11,8 @@ branding and an honest data contract:
 - Incidents and maintenance notices are written in **Markdown** by an authenticated admin.
 
 Stack: Next.js 15 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase Postgres + Auth + RLS ·
-GitHub Actions · Vercel. No Docker or local Supabase container is required.
+Supabase pg_cron + pg_net for scheduling · Vercel. No Docker or local Supabase container is required.
+The ops desk can draft incident copy with Groq; drafts stay in the form until you publish them.
 
 ---
 
@@ -29,6 +30,18 @@ GitHub Actions · Vercel. No Docker or local Supabase container is required.
 
 The admin area is `noindex`, protected by middleware, re-checked in every server action, and backed by Row
 Level Security.
+
+### Drafting incident copy
+
+The incident forms have a **Draft the copy** box: describe the problem the way you would tell a colleague and
+Groq turns it into a title and a customer-facing update.
+
+- Requires `GROQ` in the environment. Without it the box is not rendered — there is no button that does nothing.
+- `POST /api/incident-draft` verifies the Supabase session **and** the `admin_users` allowlist before it calls
+  Groq, and maps provider failures (bad key, rate limit, timeout) to readable messages.
+- It writes into the form fields and never publishes. You stay responsible for the wording.
+- It only sees your notes plus the status, impact, and service names you picked. It never reads check data,
+  so it cannot invent a cause your notes do not contain — and the prompt forbids it anyway.
 
 ---
 
@@ -57,14 +70,12 @@ You only need a **cloud Supabase project**. No local stack, CLI daemon, or Docke
    Creating an auth user is not enough; `admin_users` is a separate allowlist with no public write policy.
 7. **Auth URL settings** — Authentication → URL Configuration: set **Site URL** to the production URL
    (for example `https://status.fasthandstudio.asia`). Password sign-in does not need email redirects.
-8. **GitHub Actions secrets** — repository → Settings → Secrets and variables → Actions:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-9. **Vercel environment variables** — Project → Settings → Environment Variables:
+8. **Vercel environment variables** — Project → Settings → Environment Variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (used by “Run check now”)
+   - `SUPABASE_SERVICE_ROLE_KEY` (used by “Run check now” and by `POST /api/checks/run`)
    - `NEXT_PUBLIC_SITE_URL`
+   - `GROQ` — optional. Your Groq API key. Without it the ops desk simply has no draft button.
 
 That is the complete list. You do not need to create tables by hand; the migrations do it.
 
@@ -100,9 +111,10 @@ inventing uptime, and `/admin/login` lists the missing variables.
 
 ## 3. Checks and automation
 
-`npm run checks` (and `.github/workflows/status-checks.yml`, every five minutes) does this:
+Supabase drives the schedule through `POST /api/checks/run`. Every run — scheduled or `npm run checks` — does
+this:
 
-1. Inserts a `monitor_runs` row (`source = github-actions`).
+1. Inserts a `monitor_runs` row (`source = pg-cron` for scheduled runs, `manual` for `npm run checks`).
 2. Loads every **enabled** monitor.
 3. Performs the HTTP request: expected status range, optional expected phrase (whitespace-normalised),
    timeout, redirects followed.
@@ -118,17 +130,17 @@ inventing uptime, and `/admin/login` lists the missing variables.
 6. Prunes checks older than `CHECK_RETENTION_DAYS` (default 120).
 7. Closes the run row with counts.
 
-A failing endpoint is **data**, so the workflow still succeeds. A database write failure or an internal
-error exits non-zero so it shows up in the Actions history.
+A failing endpoint is **data**, so the run still reports success. A database write failure or an internal
+error exits non-zero and, for scheduled runs, shows up as an unanswered call.
 
-GitHub Actions cron is best-effort; runs can be delayed. The public page uses `max(3 × interval, 15 min)` as
-the staleness window and shows **Unknown** once evidence is late.
+The public page uses `max(3 × interval, 15 min)` as the staleness window and shows **Unknown** once evidence
+is late.
 
-### Supabase pg_cron fallback
+### Scheduling the checks with pg_cron
 
-GitHub's scheduler can be unreliable for new repositories. The same runner is exposed at
-`POST /api/checks/run`, authenticated with the service-role key, so Supabase can drive the five-minute
-cadence instead:
+There is no second scheduler. GitHub Actions was removed as a check runner on 2026-10-26: its schedule fired
+three times in six hours while pg_cron held the five-minute cadence, and two runners writing overlapping runs
+made the history harder to read.
 
 1. Store the service-role key in **Supabase Vault** as `status_service_key`.
 2. Enable `pg_cron` and `pg_net` in **Database → Extensions**.
@@ -154,8 +166,18 @@ select cron.schedule(
 );
 ```
 
-Remove it with `select cron.unschedule('fasthand-status-checks');`. Runs written this way have
-`source = pg-cron`.
+Check it is alive:
+
+```sql
+select jobname, last_run_at, result, jobstatus
+from cron.job_run_details
+where jobname = 'fasthand-status-checks'
+order by start_time desc
+limit 5;
+```
+
+Remove it with `select cron.unschedule('fasthand-status-checks');`. `POST /api/checks/run` authenticates the
+caller with the service-role key as a bearer token and is the only endpoint pg_cron needs.
 
 ---
 
@@ -201,7 +223,7 @@ render as **No check**. Add them only when their health endpoints exist and have
 2. Framework preset: **Next.js**. Build command `npm run build`, output handled automatically.
 3. Add the environment variables from step 1 for Production, Preview, and Development as appropriate.
 4. Deploy, then set the Supabase **Site URL** to the final domain.
-5. Add the same repository secrets to GitHub so the scheduled workflow can write checks.
+5. Point the pg_cron job at the deployed URL and confirm `monitor_runs.source = pg-cron` rows appear.
 6. Deployment Protection: if **Vercel Authentication** is enabled, `*.vercel.app` URLs return a login page.
    Either turn it off for this project or attach the real status domain (custom domains are excluded by the
    `all_except_custom_domains` setting).
@@ -241,12 +263,13 @@ and update authors.
 ```text
 app/(public)/          Public status, services, incidents, maintenance, history
 app/admin/             Login + protected ops desk routes and server actions
+app/api/               pg_cron check trigger and the admin-only draft writer
 components/            Public UI, admin UI, Markdown renderer
 lib/                   Types, queries, auth, status math, checks, automation, validation
 supabase/migrations/   Schema, seed, security hardening
 scripts/               Check runner and admin allowlist CLI
 tests/                 Pure-function tests for status math, checks, automation, validation
-.github/workflows/     Scheduled checks + CI
+.github/workflows/     CI only (typecheck, test, build)
 docs/RUNBOOK.md        What to do during an incident or when the runner stops
 ```
 
@@ -261,15 +284,18 @@ npm run build
 ```
 
 The tests cover the parts that must not lie: stale detection, incident thresholds, duplicate-incident
-guards, uptime truncation, check parsing, and UTC date handling.
+guards, uptime truncation, check parsing, UTC date handling, and the draft writer's prompt shape, output
+limits, and failure codes.
 
 ---
 
 ## 10. Deliberate limitations
 
 - **No fabricated demo history.** A fresh database shows empty bars and **Waiting for the first check** until
-  the workflow runs.
+  the cron job has run.
 - **No email/SMS subscribers yet.** The page does not show a subscribe form that does nothing.
 - **No per-service public pages.** Service details live in the directory and group rows.
-- **GitHub Actions is not a real-time pager.** Five-minute cadence is the free-tier fit; sustained outages
-  are detected after the failure threshold, not instantly.
+- **Five-minute cadence, not a pager.** Scheduling stops if the Vercel deployment is unreachable or the
+  pg_cron job is dropped; sustained outages are detected after the failure threshold, not instantly.
+- **Drafts are not truth.** The Groq writer only turns what you tell it into customer-facing prose. It never
+  sees check data, cannot publish, and its output goes into the form for you to correct first.

@@ -4,9 +4,7 @@ import { runScheduledChecks } from '../lib/run-scheduled-checks';
 loadEnv({ path: '.env.local' });
 loadEnv({ path: '.env' });
 
-const source =
-  process.env.CHECK_SOURCE?.trim() ||
-  (process.env.GITHUB_ACTIONS === 'true' ? 'github-actions' : 'manual');
+const source = process.env.CHECK_SOURCE?.trim() || 'manual';
 const retentionDays = Number(process.env.CHECK_RETENTION_DAYS ?? '120');
 
 runScheduledChecks({ source, retentionDays })

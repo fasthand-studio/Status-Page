@@ -14,25 +14,30 @@ export function ServiceCheckboxes({
   defaultSelected = [],
   name = 'service_ids',
   label = 'Affected services',
+  onSelectionChange,
 }: {
   services: ServiceOption[];
   defaultSelected?: string[];
   name?: string;
   label?: string;
+  onSelectionChange?: (ids: string[]) => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set(defaultSelected));
 
+  function commit(next: Set<string>) {
+    setSelected(next);
+    onSelectionChange?.([...next]);
+  }
+
   function toggle(id: string) {
-    setSelected((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    commit(next);
   }
 
   function setAll(values: string[]) {
-    setSelected(new Set(values));
+    commit(new Set(values));
   }
 
   const grouped = new Map<string, ServiceOption[]>();
