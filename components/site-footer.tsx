@@ -35,7 +35,7 @@ export function SiteFooter() {
         </div>
         <div className="mt-4 flex flex-col gap-1 border-t border-line pt-3 text-[14px] text-muted sm:flex-row sm:items-center sm:justify-between">
           <span>© {year} FastHand Studio</span>
-          <span>Checks every 5 minutes · all times UTC</span>
+          <span>All times UTC</span>
         </div>
       </div>
     </footer>

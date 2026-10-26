@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { CheckRunnerNote } from '@/components/check-runner-note';
 import { DataError } from '@/components/data-error';
 import { AlertIcon } from '@/components/icons';
 import { PageHeader } from '@/components/page-header';
@@ -115,9 +114,8 @@ export default async function ServicesPage() {
         }
       />
 
-      <div className="mt-2 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-2">
         <UptimeLegend />
-        <CheckRunnerNote lastRun={snapshot.lastRun} now={now} />
       </div>
 
       {overall.staleCount > 0 && (

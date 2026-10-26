@@ -59,7 +59,6 @@ const STATE_CELLS: { state: HealthState; icon: typeof CheckIcon; tone: string }[
   { state: 'outage', icon: CrossIcon, tone: 'text-bad' },
   { state: 'maintenance', icon: WrenchIcon, tone: 'text-info' },
   { state: 'unknown', icon: MinusIcon, tone: 'text-muted' },
-  { state: 'unmonitored', icon: MinusIcon, tone: 'text-muted' },
 ];
 
 export function ServicesExplorer({
@@ -138,7 +137,7 @@ export function ServicesExplorer({
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {STATE_CELLS.map(({ state, icon: Icon, tone }) => (
           <div key={state} className="fh-card border border-line bg-surface px-2.5 py-2">
             <span className="flex items-center gap-1 text-[14px] text-muted">

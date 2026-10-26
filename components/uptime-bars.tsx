@@ -14,6 +14,15 @@ const TONE_CLASS = {
   empty: 'bg-[#dfe3e8]',
 } as const;
 
+const TONE_WORD = { ok: 'Healthy', 'ok-soft': 'Healthy', warn: 'Degraded', bad: 'Outage', empty: 'No data' } as const;
+const TONE_TEXT = {
+  ok: 'text-ok',
+  'ok-soft': 'text-ok',
+  warn: 'text-warn',
+  bad: 'text-bad',
+  empty: 'text-muted',
+} as const;
+
 export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const totalChecks = bars.reduce((total, bar) => total + bar.checks, 0);
@@ -32,16 +41,16 @@ export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string })
             role="status"
           >
             <span className="block text-muted">{formatDayLabel(active.day)}</span>
-            <span className="mt-0.5 block fh-num">
-              {active.percent === null ? 'No checks recorded' : `${formatUptime(active.percent)} uptime`}
-              {active.checks > 0 && ` · ${active.checks} checks`}
+            <span className={cn('mt-0.5 block fh-num', TONE_TEXT[barTone(active)])}>
+              {TONE_WORD[barTone(active)]}
+              {active.percent !== null && ` · ${formatUptime(active.percent)} uptime`}
             </span>
           </div>
         )}
 
         <div
           role="img"
-          aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days, ${totalChecks} checks recorded`}
+          aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days`}
           className="fh-bars"
         >
           {bars.map((bar, index) => (

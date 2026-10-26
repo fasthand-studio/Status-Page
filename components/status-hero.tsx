@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import type { OverallStatus } from '@/lib/status';
-import type { MonitorRun } from '@/lib/types';
 import { AutoRefresh } from './auto-refresh';
-import { CheckRunnerNote } from './check-runner-note';
 import { AlertIcon, CheckIcon, CrossIcon, MinusIcon, WrenchIcon } from './icons';
 
 const TONE = {
@@ -38,16 +36,10 @@ function Fact({ label, value }: { label: string; value: ReactNode }) {
 
 export function StatusHero({
   overall,
-  lastRun,
-  lastCheckAt,
   openIncidents,
-  now,
 }: {
   overall: OverallStatus;
-  lastRun: MonitorRun | null;
-  lastCheckAt: string | null;
   openIncidents: number;
-  now: Date;
 }) {
   const tone = TONE[overall.tone];
 
@@ -63,9 +55,8 @@ export function StatusHero({
             {overall.detail}
           </p>
         )}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[14px] text-muted">
+        <div className="mt-3 flex justify-center text-[14px] text-muted">
           <AutoRefresh />
-          <span>Checks every 5 min</span>
         </div>
       </div>
 
@@ -75,13 +66,6 @@ export function StatusHero({
         <Fact label="Stale" value={overall.staleCount} />
         <Fact label="Open incidents" value={openIncidents} />
       </div>
-
-      <CheckRunnerNote
-        lastRun={lastRun}
-        now={now}
-        lastCheckAt={lastCheckAt}
-        className="border-t border-line px-4 py-2 text-center sm:px-5"
-      />
     </section>
   );
 }

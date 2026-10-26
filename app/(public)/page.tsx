@@ -9,17 +9,9 @@ import { StatusHero } from '@/components/status-hero';
 import { getStatusSnapshot } from '@/lib/data';
 import { formatRelativeTime } from '@/lib/format';
 import { deriveOverallStatus } from '@/lib/status';
-import type { IncidentWithRelations, MaintenanceWithServices, StatusSnapshot } from '@/lib/types';
+import type { IncidentWithRelations, MaintenanceWithServices } from '@/lib/types';
 
 const IMPACT_ORDER = { critical: 4, major: 3, minor: 2, none: 1 } as const;
-
-function lastCheckAt(snapshot: StatusSnapshot): string | null {
-  return snapshot.monitors.reduce<string | null>((latest, monitor) => {
-    if (!monitor.checked_at) return latest;
-    if (!latest) return monitor.checked_at;
-    return new Date(monitor.checked_at) > new Date(latest) ? monitor.checked_at : latest;
-  }, null);
-}
 
 export default async function HomePage() {
   const snapshot = await getStatusSnapshot();
@@ -55,10 +47,7 @@ export default async function HomePage() {
               maintenance: [],
               now,
             })}
-            lastRun={null}
-            lastCheckAt={null}
             openIncidents={0}
-            now={now}
           />
         </div>
         <div className="mt-4">
@@ -100,8 +89,6 @@ export default async function HomePage() {
       .map((row) => serviceById.get(row.service_id)?.name)
       .filter((name): name is string => Boolean(name));
 
-  const latest = lastCheckAt(snapshot);
-
   return (
     <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-5 sm:px-6 sm:pt-8">
       <h1 className="text-center text-[26px] font-semibold leading-tight tracking-[-0.015em]">
@@ -111,10 +98,7 @@ export default async function HomePage() {
       <div className="mt-5">
         <StatusHero
           overall={overall}
-          lastRun={snapshot.lastRun}
-          lastCheckAt={latest}
           openIncidents={snapshot.openIncidents.length}
-          now={now}
         />
       </div>
 
