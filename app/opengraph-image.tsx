@@ -14,9 +14,9 @@ export default function OpengraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          backgroundColor: '#0A0E0C',
+          backgroundColor: '#FFFFFF',
           padding: '72px 80px',
-          color: '#FFFFFF',
+          color: '#15191F',
           fontFamily: 'sans-serif',
         }}
       >
@@ -30,6 +30,7 @@ export default function OpengraphImage() {
               height: 76,
               borderRadius: 20,
               backgroundColor: '#5200FE',
+              color: '#FFFFFF',
               fontSize: 46,
               fontWeight: 700,
             }}
@@ -43,7 +44,7 @@ export default function OpengraphImage() {
               fontSize: 24,
               fontWeight: 600,
               letterSpacing: 6,
-              color: '#A7B0AA',
+              color: '#5A6470',
             }}
           >
             FASTHAND STATUS
@@ -60,7 +61,7 @@ export default function OpengraphImage() {
               marginTop: 20,
               fontSize: 36,
               lineHeight: 1.35,
-              color: '#A7B0AA',
+              color: '#5A6470',
             }}
           >
             Live health, measured uptime, and incident history.
@@ -69,7 +70,7 @@ export default function OpengraphImage() {
 
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ display: 'flex', width: 88, height: 8, borderRadius: 4, backgroundColor: '#5200FE' }} />
-          <div style={{ display: 'flex', marginLeft: 24, fontSize: 26, color: '#A7B0AA' }}>
+          <div style={{ display: 'flex', marginLeft: 24, fontSize: 26, color: '#5A6470' }}>
             Real automated checks · No estimates
           </div>
         </div>
