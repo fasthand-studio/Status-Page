@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 const siteName = 'FastHand Status';
 const description =
   'Live health, measured uptime, incident history, and scheduled maintenance for every FastHand service. Uptime comes from real automated checks, never estimates.';
+const logoUrl = `${siteUrl.replace(/\/+$/, '')}/og-logo.png`;
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <meta property="og:logo" content={logoUrl} />
         {children}
         <script
           type="application/ld+json"
