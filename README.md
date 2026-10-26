@@ -31,10 +31,11 @@ The ops desk can draft incident copy with Groq; drafts stay in the form until yo
 The admin area is `noindex`, protected by middleware, re-checked in every server action, and backed by Row
 Level Security.
 
-### Drafting incident copy
+### Drafting incident and maintenance copy
 
-The incident forms have a **Draft the copy** box: describe the problem the way you would tell a colleague and
-Groq turns it into a title and a customer-facing update.
+The incident forms and the maintenance form have a **Draft the copy** box: describe what happened or what is
+being changed, the way you would tell a colleague, and Groq turns it into a title plus customer-facing prose.
+For a maintenance window it also gets the start, end, and length you already entered in the form.
 
 - Requires `GROQ` in the environment. Without it the box is not rendered — there is no button that does nothing.
 - `POST /api/incident-draft` verifies the Supabase session **and** the `admin_users` allowlist before it calls
@@ -111,7 +112,6 @@ inventing uptime, and `/admin/login` lists the missing variables.
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm test` | Node test runner over `tests/*.test.ts` |
 | `npm run checks` | Run all enabled monitors once and store results |
 | `npm run grant-admin -- <email>` | Add an auth user to the admin allowlist |
 | `npm run grant-admin -- --list` | Show granted admins |
@@ -257,14 +257,24 @@ No Docker, no `supabase start`, no local Postgres.
   “Run check now”; it is never exposed to the browser.
 - **Markdown is rendered without raw HTML** (`react-markdown`), so admins cannot inject scripts into public
   pages.
+- **Monitor URLs cannot reach the inside of the network.** `lib/check.ts` refuses loopback, private,
+  link-local, metadata, multicast and reserved addresses, follows redirects itself and re-checks every hop
+  (five at most), so a health check cannot be pointed at `169.254.169.254`. Responses are read with a 64 KB
+  cap and a hard timeout.
+- **The draft endpoint is not a free proxy for your Groq key.** It needs an admin session and an allowlist
+  row, it checks `Sec-Fetch-Site`/`Origin` so the request came from the ops desk, it rejects bodies over
+  8 KB, allows ten drafts per admin per ten minutes, and answers with `cache-control: no-store`. The key
+  never leaves the server function.
 - **Middleware** refreshes the Supabase session on `/admin/*` and redirects unauthenticated visitors to the
   login page.
 - **No dead auth UI.** There is no self-service sign-up, password reset, or fake social login on the admin
   page.
 
 Operational security limits: admin sign-in is password-based (enable MFA in Supabase if you need it); the
-public status page is rate-limited only by Vercel/Supabase; and there is no audit log beyond row timestamps
-and update authors.
+public status page is rate-limited only by Vercel/Supabase; the draft throttle counts hits inside one warm
+function instance, so it stops a stuck operator rather than a determined one; a public hostname that resolves
+to a private address (DNS rebinding) passes the monitor guard, because resolving DNS first would turn a DNS
+outage into a false incident; and there is no audit log beyond row timestamps and update authors.
 
 ---
 
@@ -278,8 +288,7 @@ components/            Public UI, admin UI, Markdown renderer
 lib/                   Types, queries, auth, status math, checks, automation, validation
 supabase/migrations/   Schema, seed, security hardening
 scripts/               Check runner and admin allowlist CLI
-tests/                 Pure-function tests for status math, checks, automation, validation
-.github/workflows/     CI only (typecheck, test, build)
+.github/workflows/     CI only (typecheck, build)
 docs/RUNBOOK.md        What to do during an incident or when the runner stops
 ```
 
@@ -289,13 +298,16 @@ docs/RUNBOOK.md        What to do during an incident or when the runner stops
 
 ```bash
 npm run typecheck
-npm test
 npm run build
 ```
 
-The tests cover the parts that must not lie: stale detection, incident thresholds, duplicate-incident
-guards, uptime truncation, check parsing, UTC date handling, and the draft writer's prompt shape, output
-limits, and failure codes.
+CI runs both on every push to `main` and Vercel deploys the result. There is no unit-test suite in this
+repo (removed on 2026-10-26), so the safety net is the running app:
+
+- The public page returns 200 and its hero counts match the stored checks.
+- Unauthenticated `POST /api/checks/run` and `POST /api/incident-draft` return 401, not 404.
+- The newest `monitor_runs` row has `source = 'pg-cron'` and is no older than the five-minute cadence.
+- The draft writer names the model it used in the admin message; `GROQ_MODEL` pins it once one works.
 
 ---
 

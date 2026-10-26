@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdminContext } from '@/lib/auth';
+import { isWriterConfigured } from '@/lib/incident-writer';
 import { loadAdminMaintenanceItem } from '@/lib/admin-data';
 import { updateMaintenanceAction } from '@/app/admin/actions';
 import { formatDateTime, formatWindow } from '@/lib/format';
@@ -85,6 +86,7 @@ export default async function AdminMaintenanceItemPage({
           window={window}
           services={services}
           submitLabel="Save window"
+          writerEnabled={isWriterConfigured()}
         />
 
         <aside className="space-y-3">

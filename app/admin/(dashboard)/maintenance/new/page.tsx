@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireAdminContext } from '@/lib/auth';
+import { isWriterConfigured } from '@/lib/incident-writer';
 import { loadAdminMaintenance } from '@/lib/admin-data';
 import { createMaintenanceAction } from '@/app/admin/actions';
 import { MaintenanceForm } from '@/components/admin/maintenance-form';
@@ -43,6 +44,7 @@ export default async function NewMaintenancePage() {
         action={createMaintenanceAction}
         services={data.services}
         submitLabel="Publish window"
+        writerEnabled={isWriterConfigured()}
       />
     </div>
   );

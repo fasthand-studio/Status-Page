@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { DraftMode } from '@/lib/incident-writer';
-import type { IncidentImpact, IncidentStatus } from '@/lib/types';
+import type { DraftMode, DraftStatus } from '@/lib/incident-writer';
+import type { IncidentImpact } from '@/lib/types';
 import { PencilIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { adminHintClass, adminLabelClass, secondaryButtonClass } from './ui';
@@ -13,19 +13,37 @@ export interface WrittenDraft {
   model?: string;
 }
 
+const PROMPT: Record<DraftMode, { label: string; placeholder: string }> = {
+  incident: {
+    label: 'What is the issue?',
+    placeholder: 'Write it the way you would tell a colleague. The draft turns that into customer-facing copy.',
+  },
+  update: {
+    label: 'What has changed since the last update?',
+    placeholder: 'Write it the way you would tell a colleague. The draft turns that into customer-facing copy.',
+  },
+  maintenance: {
+    label: 'What is changing?',
+    placeholder:
+      'Describe the work, what customers may notice, and how long it should take. The draft turns that into the public notice.',
+  },
+};
+
 export function DraftWriter({
   mode,
   status,
   impact,
   services,
   incidentTitle,
+  scheduledFor,
   onDraft,
 }: {
   mode: DraftMode;
-  status: IncidentStatus;
+  status: DraftStatus;
   impact?: IncidentImpact;
   services?: string[];
   incidentTitle?: string;
+  scheduledFor?: string;
   onDraft: (draft: WrittenDraft) => void;
 }) {
   const [notes, setNotes] = useState('');
@@ -39,7 +57,7 @@ export function DraftWriter({
       const response = await fetch('/api/incident-draft', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ mode, status, impact, services, incidentTitle, notes }),
+        body: JSON.stringify({ mode, status, impact, services, incidentTitle, scheduledFor, notes }),
       });
       const payload = (await response.json()) as WrittenDraft & { error?: string };
       if (!response.ok) {
@@ -63,7 +81,7 @@ export function DraftWriter({
   return (
     <div className="fh-r-sm border border-line bg-paper px-2.5 py-2">
       <label htmlFor="draft-notes" className={adminLabelClass}>
-        <span>What is the issue?</span>
+        <span>{PROMPT[mode].label}</span>
         <span className="text-[14px] font-normal text-ink/70">Required</span>
       </label>
       <textarea
@@ -71,7 +89,7 @@ export function DraftWriter({
         rows={3}
         value={notes}
         onChange={(event) => setNotes(event.target.value)}
-        placeholder="Write it the way you would tell a colleague. The draft turns that into customer-facing copy."
+        placeholder={PROMPT[mode].placeholder}
         className="mt-1.5 w-full fh-r-sm border border-line bg-surface px-2.5 py-2 text-[15px] leading-relaxed text-ink placeholder:text-muted/70 transition-colors focus:border-primary focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       />
       <div className="mt-2 flex flex-wrap items-center gap-2">

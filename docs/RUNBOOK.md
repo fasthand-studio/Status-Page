@@ -96,6 +96,9 @@ Requires `.env.local` with `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) and
 - **Scheduled** marks affected services as maintenance while the window is open.
 - **In progress** is active immediately, regardless of the start time.
 - **Completed** / **cancelled** stop affecting health but stay in the public archive.
+- In a hurry, describe the work under **What is changing?** and press **Draft the copy**. It uses your notes
+  plus the status, services, and times already in the form, writes the title and the public notice, and
+  publishes nothing until you do.
 
 ## Things this system will never do
 
@@ -103,3 +106,5 @@ Requires `.env.local` with `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`) and
 - Treat a late check as healthy.
 - Let a public visitor write incidents or read monitor URLs and raw errors.
 - Let a signed-in non-admin reach the ops desk.
+- Let a health check reach an internal address: loopback, private, link-local, and metadata URLs are refused
+  before the request is made, and every redirect hop is checked again.

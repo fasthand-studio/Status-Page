@@ -1,5 +1,5 @@
-import type { IncidentImpact, IncidentStatus } from './types';
-import { INCIDENT_IMPACT_LABELS, INCIDENT_STATUS_LABELS } from './validation';
+import type { IncidentImpact, IncidentStatus, MaintenanceStatus } from './types';
+import { INCIDENT_IMPACT_LABELS, INCIDENT_STATUS_LABELS, MAINTENANCE_STATUS_LABELS } from './validation';
 
 const CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODELS_URL = 'https://api.groq.com/openai/v1/models';
@@ -22,15 +22,17 @@ export const NOTES_LIMIT = 1500;
 export const TITLE_LIMIT = 140;
 export const BODY_LIMIT = 4000;
 
-export type DraftMode = 'incident' | 'update';
+export type DraftMode = 'incident' | 'update' | 'maintenance';
+export type DraftStatus = IncidentStatus | MaintenanceStatus;
 
 export interface DraftInput {
   mode: DraftMode;
   notes: string;
-  status: IncidentStatus;
+  status: DraftStatus;
   impact?: IncidentImpact;
   services?: string[];
   incidentTitle?: string;
+  scheduledFor?: string;
 }
 
 export interface DraftContent {
@@ -75,7 +77,7 @@ export function isWriterConfigured(): boolean {
   return Boolean(process.env.GROQ?.trim());
 }
 
-const VOICE: Record<IncidentStatus, string> = {
+const VOICE: Record<DraftStatus, string> = {
   investigating:
     'Say what customers are seeing and that the team is looking into it. Do not name a cause unless the notes do.',
   identified:
@@ -84,12 +86,29 @@ const VOICE: Record<IncidentStatus, string> = {
     'Say a fix has been applied and results are being watched. Do not promise it will hold.',
   resolved:
     'Say the problem is fixed and what to do if the customer is still affected. No future promises.',
+  scheduled:
+    'Say what is changing, what customers may notice while the window is open, and how long the window is. Never promise it finishes on time.',
+  in_progress:
+    'Say the maintenance is happening now and what customers should expect until it ends.',
+  completed: 'Say the maintenance is finished and what to do if something still looks wrong.',
+  cancelled: 'Say the window was cancelled and that customers need to do nothing.',
+};
+
+const MODE_LABEL: Record<DraftMode, string> = {
+  incident: 'new incident',
+  update: 'timeline update',
+  maintenance: 'maintenance window',
+};
+
+const STATUS_LABEL: Record<DraftStatus, string> = {
+  ...INCIDENT_STATUS_LABELS,
+  ...MAINTENANCE_STATUS_LABELS,
 };
 
 export function buildMessages(input: DraftInput): { role: string; content: string }[] {
   const lines = [
-    `Mode: ${input.mode === 'incident' ? 'new incident' : 'timeline update'}`,
-    `Status: ${INCIDENT_STATUS_LABELS[input.status]}`,
+    `Mode: ${MODE_LABEL[input.mode]}`,
+    `Status: ${STATUS_LABEL[input.status] ?? input.status}`,
   ];
 
   if (input.mode === 'update' && input.incidentTitle) {
@@ -97,6 +116,9 @@ export function buildMessages(input: DraftInput): { role: string; content: strin
   }
   if (input.impact) {
     lines.push(`Impact: ${INCIDENT_IMPACT_LABELS[input.impact]}`);
+  }
+  if (input.mode === 'maintenance' && input.scheduledFor) {
+    lines.push(`Scheduled: ${input.scheduledFor}`);
   }
   const services = (input.services ?? []).filter((name) => name.trim()).slice(0, 20);
   if (services.length > 0) {
@@ -106,9 +128,9 @@ export function buildMessages(input: DraftInput): { role: string; content: strin
   lines.push(`Operator notes (the only facts available): ${input.notes.trim()}`);
 
   const replyFormat =
-    input.mode === 'incident'
-      ? 'Reply in plain text with exactly two blocks, no code fences:\nTITLE: <title on one line>\nBODY: <the update>'
-      : 'Reply in plain text with exactly one block, no code fences:\nBODY: <the update>';
+    input.mode === 'update'
+      ? 'Reply in plain text with exactly one block, no code fences:\nBODY: <the update>'
+      : 'Reply in plain text with exactly two blocks, no code fences:\nTITLE: <title on one line>\nBODY: <the notice>';
 
   return [
     {
@@ -121,7 +143,7 @@ export function buildMessages(input: DraftInput): { role: string; content: strin
         '- If the notes do not explain why something broke, say the cause is still being determined. Do not guess.',
         '- Write for a customer reading the page in the middle of the problem: plain sentences, present tense, second person for what they see, no jargon, no blame, no emoji, no exclamation marks.',
         '- No markdown headings, links, or bullet lists. One short paragraph of two to four sentences.',
-        '- The title names the affected service and the symptom, sentence case, under 140 characters, and does not contain a status word.',
+        '- The title names the affected service and what is happening, sentence case, under 140 characters, and does not contain a status word.',
         '',
         replyFormat,
       ].join('\n'),
@@ -151,7 +173,7 @@ export function parseDraft(raw: string, mode: DraftMode): DraftContent {
 
   const body = clean(bodySource, BODY_LIMIT);
   if (!body) throw new WriterError('bad-output');
-  if (mode !== 'incident') return { title: null, body };
+  if (mode === 'update') return { title: null, body };
 
   const title = clean(titleMatch?.[1] ?? '', TITLE_LIMIT);
   if (title.length < 3) throw new WriterError('bad-output');

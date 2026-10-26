@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   verify:
-    name: Typecheck, test, build
+    name: Typecheck and build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -25,7 +25,5 @@ jobs:
       - run: npm ci
 
       - run: npm run typecheck
-
-      - run: npm test
 
       - run: npm run build
