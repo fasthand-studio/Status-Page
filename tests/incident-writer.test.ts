@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMessages, draftIncidentCopy, parseDraft, WriterError } from '../lib/incident-writer';
+import {
+  buildMessages,
+  draftIncidentCopy,
+  parseDraft,
+  writerModel,
+  WriterError,
+} from '../lib/incident-writer';
 
 function userPrompt(input: Parameters<typeof buildMessages>[0]): string {
   const messages = buildMessages(input);
@@ -23,7 +29,7 @@ test('the incident prompt carries only the operator facts', () => {
   assert.match(prompt, /Seller panel logins fail for users in Dhaka/);
 });
 
-test('an update prompt names the incident and omits the title instruction', () => {
+test('an update prompt names the incident and skips the service list', () => {
   const prompt = userPrompt({
     mode: 'update',
     notes: 'Failures stopped after the connection pool was raised.',
@@ -45,38 +51,57 @@ test('the system prompt forbids invented causes', () => {
   assert.match(system, /still being determined/);
 });
 
-test('incident drafts keep a usable title and trimmed body', () => {
+test('the reply format asks for blocks, not json', () => {
+  const incident = buildMessages({ mode: 'incident', notes: 'x', status: 'investigating' })[0].content;
+  const update = buildMessages({ mode: 'update', notes: 'x', status: 'resolved' })[0].content;
+
+  assert.match(incident, /TITLE: <title on one line>/);
+  assert.match(incident, /BODY: <the update>/);
+  assert.match(update, /exactly one block/);
+  assert.doesNotMatch(update, /TITLE/);
+});
+
+test('incident blocks are trimmed into a title and a body', () => {
   const draft = parseDraft(
-    JSON.stringify({
-      title: '  Seller panel login is failing  ',
-      body: 'We are investigating.\n\n\n\nSome trailing space  ',
-    }),
+    'TITLE:   Seller panel login is failing  \nBODY: We are investigating.\n\n\n\nTrailing space  ',
     'incident',
   );
 
   assert.equal(draft.title, 'Seller panel login is failing');
-  assert.equal(draft.body, 'We are investigating.\n\nSome trailing space');
+  assert.equal(draft.body, 'We are investigating.\n\nTrailing space');
 });
 
-test('update drafts never carry a title', () => {
-  const draft = parseDraft(JSON.stringify({ title: 'Ignored', body: 'Cause found.' }), 'update');
+test('a fenced reply is still parsed', () => {
+  const draft = parseDraft(
+    ['```', 'TITLE: Checkout stalls', 'BODY: Some payments are slower than normal.', '```'].join('\n'),
+    'incident',
+  );
 
-  assert.equal(draft.title, null);
-  assert.equal(draft.body, 'Cause found.');
+  assert.equal(draft.title, 'Checkout stalls');
+  assert.equal(draft.body, 'Some payments are slower than normal.');
+});
+
+test('update drafts ignore a title and accept plain prose', () => {
+  assert.deepEqual(parseDraft('BODY: Cause found, working on it.', 'update'), {
+    title: null,
+    body: 'Cause found, working on it.',
+  });
+
+  assert.deepEqual(parseDraft('TITLE: Ignored\nThe fix is deployed and we are watching.', 'update'), {
+    title: null,
+    body: 'The fix is deployed and we are watching.',
+  });
 });
 
 test('a draft over the field limit is cut, not passed through', () => {
-  const draft = parseDraft(
-    JSON.stringify({ title: 'a'.repeat(300), body: 'b'.repeat(9000) }),
-    'incident',
-  );
+  const draft = parseDraft(`TITLE: ${'a'.repeat(300)}\nBODY: ${'b'.repeat(9000)}`, 'incident');
 
   assert.equal(draft.title?.length, 140);
   assert.equal(draft.body.length, 4000);
 });
 
-test('unreadable provider output fails as a draft problem', () => {
-  for (const raw of ['not json at all', '{"title":"Only a title"}', '{"body":"   "}', 'null']) {
+test('an incident draft without a usable title is a failed draft', () => {
+  for (const raw of ['', '   ', 'We are looking into it.', 'TITLE: ab\nBODY: Too short to publish.']) {
     assert.throws(() => parseDraft(raw, 'incident'), WriterError);
   }
 });
@@ -95,12 +120,13 @@ test('the writer sends the key it was given and returns the parsed draft', async
     assert.equal(String(url), 'https://api.groq.com/openai/v1/chat/completions');
     assert.equal(init?.method, 'POST');
     assert.equal(new Headers(init?.headers).get('authorization'), 'Bearer test-key');
-    assert.equal(body.response_format.type, 'json_object');
+    assert.equal(body.model, 'llama-3.1-8b-instant');
+    assert.equal(body.response_format, undefined);
     assert.equal(body.messages.length, 2);
 
     return new Response(
       JSON.stringify({
-        choices: [{ message: { content: '{"title":"Checkout is timing out","body":"We are investigating."}' } }],
+        choices: [{ message: { content: 'TITLE: Checkout is timing out\nBODY: We are investigating.' } }],
       }),
       { status: 200, headers: { 'content-type': 'application/json' } },
     );
@@ -117,6 +143,30 @@ test('the writer sends the key it was given and returns the parsed draft', async
   }
 });
 
+test('GROQ_MODEL picks the model when it is set', async () => {
+  process.env.GROQ = 'test-key';
+  process.env.GROQ_MODEL = 'llama-3.3-70b-versatile';
+  const original = globalThis.fetch;
+  const sent: string[] = [];
+  globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
+    sent.push(JSON.parse(String(init?.body)).model);
+    return new Response(
+      JSON.stringify({ choices: [{ message: { content: 'TITLE: A title\nBODY: A body.' } }] }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    );
+  }) as typeof fetch;
+
+  try {
+    assert.equal(writerModel(), 'llama-3.3-70b-versatile');
+    await draftIncidentCopy(request);
+    assert.deepEqual(sent, ['llama-3.3-70b-versatile']);
+  } finally {
+    globalThis.fetch = original;
+    delete process.env.GROQ;
+    delete process.env.GROQ_MODEL;
+  }
+});
+
 test('a rate limit from Groq surfaces as a retryable failure', async () => {
   process.env.GROQ = 'test-key';
   const original = globalThis.fetch;
@@ -126,6 +176,32 @@ test('a rate limit from Groq surfaces as a retryable failure', async () => {
     await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
       assert.ok(caught instanceof WriterError);
       assert.equal(caught.code, 'rate-limited');
+      return true;
+    });
+  } finally {
+    globalThis.fetch = original;
+    delete process.env.GROQ;
+  }
+});
+
+test('a rejected request tells you what Groq said', async () => {
+  process.env.GROQ = 'test-key';
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () =>
+    new Response(
+      JSON.stringify({
+        error: { message: 'The model `llama-9.9-400b` does not exist.', code: 'model_not_found' },
+      }),
+      { status: 400 },
+    )) as typeof fetch;
+
+  try {
+    await assert.rejects(() => draftIncidentCopy(request), (caught: unknown) => {
+      assert.ok(caught instanceof WriterError);
+      assert.equal(caught.code, 'provider-error');
+      assert.match(caught.message, /Groq HTTP 400/);
+      assert.match(caught.message, /does not exist/);
+      assert.match(caught.message, /model_not_found/);
       return true;
     });
   } finally {

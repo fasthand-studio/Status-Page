@@ -42,6 +42,11 @@ Groq turns it into a title and a customer-facing update.
 - It writes into the form fields and never publishes. You stay responsible for the wording.
 - It only sees your notes plus the status, impact, and service names you picked. It never reads check data,
   so it cannot invent a cause your notes do not contain — and the prompt forbids it anyway.
+- Model: `llama-3.1-8b-instant` unless `GROQ_MODEL` says otherwise. The reply is plain `TITLE:` / `BODY:`
+  blocks rather than JSON output mode, so it does not depend on structured-output support.
+- A failure is shown with Groq's own words, e.g. `Groq refused the request (Groq HTTP 400: The model …
+  does not exist · model_not_found)`. Change `GROQ_MODEL` in Vercel and redeploy to answer it; a bad or
+  missing key and a rate limit each get their own message.
 
 ---
 
@@ -76,6 +81,7 @@ You only need a **cloud Supabase project**. No local stack, CLI daemon, or Docke
    - `SUPABASE_SERVICE_ROLE_KEY` (used by “Run check now” and by `POST /api/checks/run`)
    - `NEXT_PUBLIC_SITE_URL`
    - `GROQ` — optional. Your Groq API key. Without it the ops desk simply has no draft button.
+   - `GROQ_MODEL` — optional. Defaults to `llama-3.1-8b-instant`.
 
 That is the complete list. You do not need to create tables by hand; the migrations do it.
 

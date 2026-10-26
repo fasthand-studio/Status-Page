@@ -2,7 +2,7 @@ import type { IncidentImpact, IncidentStatus } from './types';
 import { INCIDENT_IMPACT_LABELS, INCIDENT_STATUS_LABELS } from './validation';
 
 const CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.3-70b-versatile';
+const FALLBACK_MODEL = 'llama-3.1-8b-instant';
 const TIMEOUT_MS = 20_000;
 
 export const NOTES_LIMIT = 1500;
@@ -39,17 +39,21 @@ const FAILURES: Record<WriterFailure, string> = {
   'rate-limited': 'Groq is rate limiting this workspace. Try again in a minute.',
   timeout: 'Groq did not answer in time. Try again.',
   'bad-output': 'The draft came back unreadable. Add a little more detail and try again.',
-  'provider-error': 'Groq is unavailable right now. Write the update yourself for now.',
+  'provider-error': 'Groq refused the request.',
 };
 
 export class WriterError extends Error {
   readonly code: WriterFailure;
 
-  constructor(code: WriterFailure) {
-    super(FAILURES[code]);
+  constructor(code: WriterFailure, detail?: string) {
+    super(detail ? `${FAILURES[code]} (${detail})` : FAILURES[code]);
     this.name = 'WriterError';
     this.code = code;
   }
+}
+
+export function writerModel(): string {
+  return process.env.GROQ_MODEL?.trim() || FALLBACK_MODEL;
 }
 
 export function isWriterConfigured(): boolean {
@@ -86,6 +90,11 @@ export function buildMessages(input: DraftInput): { role: string; content: strin
   lines.push(`Voice for this status: ${VOICE[input.status]}`);
   lines.push(`Operator notes (the only facts available): ${input.notes.trim()}`);
 
+  const replyFormat =
+    input.mode === 'incident'
+      ? 'Reply in plain text with exactly two blocks, no code fences:\nTITLE: <title on one line>\nBODY: <the update>'
+      : 'Reply in plain text with exactly one block, no code fences:\nBODY: <the update>';
+
   return [
     {
       role: 'system',
@@ -98,7 +107,8 @@ export function buildMessages(input: DraftInput): { role: string; content: strin
         '- Write for a customer reading the page in the middle of the problem: plain sentences, present tense, second person for what they see, no jargon, no blame, no emoji, no exclamation marks.',
         '- No markdown headings, links, or bullet lists. One short paragraph of two to four sentences.',
         '- The title names the affected service and the symptom, sentence case, under 140 characters, and does not contain a status word.',
-        '- Reply with JSON only.',
+        '',
+        replyFormat,
       ].join('\n'),
     },
     { role: 'user', content: lines.join('\n') },
@@ -115,24 +125,35 @@ function clean(value: string, limit: number): string {
 }
 
 export function parseDraft(raw: string, mode: DraftMode): DraftResult {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    throw new WriterError('bad-output');
-  }
+  const text = raw.replace(/^[ \t]*```[a-z]*[ \t]*$/gim, '').trim();
 
-  if (typeof parsed !== 'object' || parsed === null) throw new WriterError('bad-output');
+  const bodyMatch = /BODY\s*:([\s\S]*)$/im.exec(text);
+  const titleMatch = /^[ \t]*TITLE\s*:([^\n]*)/im.exec(text);
 
-  const record = parsed as Record<string, unknown>;
-  const body = typeof record.body === 'string' ? clean(record.body, BODY_LIMIT) : '';
+  const bodySource =
+    bodyMatch?.[1] ??
+    (titleMatch ? text.slice(titleMatch.index + titleMatch[0].length) : text);
+
+  const body = clean(bodySource, BODY_LIMIT);
   if (!body) throw new WriterError('bad-output');
-
-  const rawTitle = typeof record.title === 'string' ? clean(record.title, TITLE_LIMIT) : '';
   if (mode !== 'incident') return { title: null, body };
-  if (rawTitle.length < 3) throw new WriterError('bad-output');
 
-  return { title: rawTitle, body };
+  const title = clean(titleMatch?.[1] ?? '', TITLE_LIMIT);
+  if (title.length < 3) throw new WriterError('bad-output');
+
+  return { title, body };
+}
+
+async function readFailure(response: Response): Promise<string> {
+  const body = (await response.text().catch(() => '')).slice(0, 500);
+  let message = body.trim();
+  try {
+    const parsed = JSON.parse(body) as { error?: { message?: string; code?: string } };
+    message = [parsed.error?.message, parsed.error?.code].filter(Boolean).join(' · ');
+  } catch {
+    // Groq answered with a non-JSON body; the raw text is the best clue.
+  }
+  return `Groq HTTP ${response.status}${message ? `: ${message.slice(0, 200)}` : ''}`;
 }
 
 export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult> {
@@ -148,24 +169,25 @@ export async function draftIncidentCopy(input: DraftInput): Promise<DraftResult>
         authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: MODEL,
+        model: writerModel(),
         messages: buildMessages(input),
         temperature: 0.2,
         max_tokens: 500,
-        response_format: { type: 'json_object' },
       }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (caught) {
     const timedOut = caught instanceof Error && caught.name === 'TimeoutError';
-    throw new WriterError(timedOut ? 'timeout' : 'provider-error');
+    if (timedOut) throw new WriterError('timeout');
+    throw new WriterError('provider-error', caught instanceof Error ? caught.message : 'fetch failed');
   }
 
   if (response.status === 401 || response.status === 403) throw new WriterError('unauthorized');
   if (response.status === 429) throw new WriterError('rate-limited');
   if (!response.ok) {
-    console.error(`[writer] Groq responded ${response.status}`);
-    throw new WriterError('provider-error');
+    const detail = await readFailure(response);
+    console.error(`[writer] ${detail}`);
+    throw new WriterError('provider-error', detail);
   }
 
   let payload: unknown;
