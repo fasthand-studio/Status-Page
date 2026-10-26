@@ -14,19 +14,7 @@ const TONE_CLASS = {
   empty: 'bg-[#dfe3e8]',
 } as const;
 
-export function UptimeBars({
-  bars,
-  label,
-  compact = false,
-  showLabels = true,
-  className,
-}: {
-  bars: DailyBar[];
-  label: string;
-  compact?: boolean;
-  showLabels?: boolean;
-  className?: string;
-}) {
+export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const totalChecks = bars.reduce((total, bar) => total + bar.checks, 0);
   const okChecks = bars.reduce((total, bar) => total + bar.okChecks, 0);
@@ -35,7 +23,7 @@ export function UptimeBars({
   const left = hovered !== null ? Math.min(Math.max((hovered / Math.max(1, bars.length - 1)) * 100, 10), 90) : 0;
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className="w-full">
       <div className="relative" onMouseLeave={() => setHovered(null)}>
         {active && (
           <div
@@ -54,7 +42,7 @@ export function UptimeBars({
         <div
           role="img"
           aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days, ${totalChecks} checks recorded`}
-          className={cn(compact ? 'fh-bars-compact' : 'fh-bars-wide')}
+          className="fh-bars"
         >
           {bars.map((bar, index) => (
             <div
@@ -69,13 +57,6 @@ export function UptimeBars({
           ))}
         </div>
       </div>
-
-      {showLabels && (
-        <div className="mt-1 flex items-center justify-between text-[14px] text-muted">
-          <span>{bars.length} days ago</span>
-          <span>Today</span>
-        </div>
-      )}
     </div>
   );
 }

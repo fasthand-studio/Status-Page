@@ -155,7 +155,7 @@ export function ServicesExplorer({
             ? `${matchCount} match${matchCount === 1 ? '' : 'es'} for “${query.trim()}”`
             : `${totalServices} services · ${totalMonitored} with automated checks`}
         </span>
-        <span className="hidden sm:inline">Each bar is one UTC day</span>
+        <span className="hidden sm:inline">Each bar is one UTC day, oldest on the left</span>
       </div>
 
       {filteredGroups.length === 0 ? (
@@ -206,7 +206,7 @@ export function ServicesExplorer({
                         id={`service-${service.slug}`}
                         className="group scroll-mt-24 border-b border-line last:border-b-0"
                       >
-                        <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_16px] items-center gap-x-2.5 px-3 py-2.5 transition-colors sm:px-3.5 sm:py-3 hover:bg-surface-soft md:grid-cols-[20px_minmax(0,1fr)_262px_88px_16px] [&::-webkit-details-marker]:hidden">
+                        <summary className="grid cursor-pointer list-none grid-cols-[20px_minmax(0,1fr)_76px_16px] items-center gap-x-2.5 gap-y-2.5 px-3 py-2.5 transition-colors hover:bg-surface-soft sm:px-3.5 sm:py-3 [&::-webkit-details-marker]:hidden">
                           <ServiceIcon slug={service.slug} />
                           <div className="min-w-0">
                             <span className="block truncate text-[17px] font-medium">{service.name}</span>
@@ -219,16 +219,16 @@ export function ServicesExplorer({
                                 : 'No checks recorded'}
                             </span>
                           </div>
-                          <div className="hidden md:block">
-                            <UptimeBars bars={service.bars} label={service.name} compact showLabels={false} />
-                          </div>
-                          <div className="hidden text-right md:block">
+                          <div className="text-right">
                             <span className="fh-num block text-[15px] text-ink/85">
                               {formatUptime(service.uptime90.percent)}
                             </span>
                             <span className="block text-[14px] text-muted">90d</span>
                           </div>
                           <ChevronDownIcon className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-180" />
+                          <div className="col-span-full" onClick={(event) => event.preventDefault()}>
+                            <UptimeBars bars={service.bars} label={service.name} />
+                          </div>
                         </summary>
 
                         <div className="border-t border-line bg-surface-soft px-3.5 py-3 md:pl-[44px]">
@@ -250,9 +250,6 @@ export function ServicesExplorer({
                                 ? `Last check ${formatRelativeTime(service.lastCheckAt, now)}`
                                 : 'No verified monitor'}
                             </span>
-                          </div>
-                          <div className="mt-2 md:hidden">
-                            <UptimeBars bars={service.bars} label={service.name} compact showLabels={false} />
                           </div>
                         </div>
                       </details>

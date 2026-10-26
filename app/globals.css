@@ -210,20 +210,11 @@
   }
 
   /* Bars carry their own height token so each bar's radius stays at H/2. */
-  .fh-bars-compact,
-  .fh-bars-wide {
+  .fh-bars {
+    --fh-h-bar: 20px;
     display: flex;
     align-items: stretch;
     gap: 2px;
-  }
-
-  .fh-bars-compact {
-    --fh-h-bar: 16px;
-    height: 16px;
-  }
-
-  .fh-bars-wide {
-    --fh-h-bar: 20px;
     height: 20px;
   }
 
