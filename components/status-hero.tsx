@@ -4,6 +4,7 @@ import type { OverallStatus } from '@/lib/status';
 import type { MonitorRun } from '@/lib/types';
 import { AutoRefresh } from './auto-refresh';
 import { CheckRunnerNote } from './check-runner-note';
+import { AlertIcon, CheckIcon, CrossIcon, MinusIcon, WrenchIcon } from './icons';
 
 const TONE = {
   ok: 'text-ok',
@@ -13,12 +14,17 @@ const TONE = {
   info: 'text-info',
 } as const;
 
-function StatusDot({ className }: { className: string }) {
-  return (
-    <svg viewBox="0 0 12 12" aria-hidden="true" className={cn('h-2.5 w-2.5 shrink-0', className)}>
-      <circle cx="6" cy="6" r="6" fill="currentColor" />
-    </svg>
-  );
+const ICON = {
+  ok: CheckIcon,
+  warn: AlertIcon,
+  bad: CrossIcon,
+  muted: MinusIcon,
+  info: WrenchIcon,
+} as const;
+
+function StatusIcon({ tone, className }: { tone: keyof typeof ICON; className?: string }) {
+  const Icon = ICON[tone];
+  return <Icon aria-hidden="true" strokeWidth={2.4} className={cn('h-4 w-4 shrink-0', className)} />;
 }
 
 function Fact({ label, value }: { label: string; value: ReactNode }) {
@@ -49,7 +55,7 @@ export function StatusHero({
     <section className="fh-panel border border-line bg-surface">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 px-4 py-3.5 sm:px-5">
         <div className="flex min-w-0 items-start gap-2.5">
-          <StatusDot className={cn('mt-1.5', tone)} />
+          <StatusIcon tone={overall.tone} className={cn('mt-[3px]', tone)} />
           <div className="min-w-0">
             <h1 className="text-[18px] font-semibold leading-tight tracking-[-0.01em]">
               {overall.label}
