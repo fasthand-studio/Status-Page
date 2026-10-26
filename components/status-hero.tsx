@@ -52,26 +52,24 @@ export function StatusHero({
   const tone = TONE[overall.tone];
 
   return (
-    <section className="fh-panel border border-line bg-surface">
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 px-4 py-3.5 sm:px-5">
-        <div className="flex min-w-0 items-start gap-2.5">
-          <StatusIcon tone={overall.tone} className={cn('mt-[3px] h-5 w-5 shrink-0', tone)} />
-          <div className="min-w-0">
-            <h1 className="text-[20px] font-semibold leading-tight tracking-[-0.01em]">
-              {overall.label}
-            </h1>
-            {overall.detail && (
-              <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-muted">{overall.detail}</p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col gap-0.5 text-[14px] text-muted sm:items-end">
+    <section className="fh-panel border border-line bg-surface-soft">
+      <div className="px-4 py-7 text-center sm:px-6">
+        <StatusIcon tone={overall.tone} className={cn('mx-auto h-7 w-7', tone)} />
+        <h2 className="mt-2.5 text-[20px] font-semibold leading-tight tracking-[-0.01em]">
+          {overall.label}
+        </h2>
+        {overall.detail && (
+          <p className="mx-auto mt-2 max-w-[520px] text-[15px] leading-relaxed text-muted">
+            {overall.detail}
+          </p>
+        )}
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[14px] text-muted">
           <AutoRefresh />
           <span>Checks every 5 min</span>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line px-4 py-2 text-[14px] text-muted sm:px-5">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-line px-4 py-2 text-[14px] text-muted sm:px-5">
         <Fact label="Monitored" value={`${overall.monitoredCount} / ${overall.totalServices}`} />
         <Fact label="Fresh" value={`${overall.freshCount} / ${overall.monitoredCount}`} />
         <Fact label="Stale" value={overall.staleCount} />
@@ -82,7 +80,7 @@ export function StatusHero({
         lastRun={lastRun}
         now={now}
         lastCheckAt={lastCheckAt}
-        className="border-t border-line px-4 py-2 sm:px-5"
+        className="border-t border-line px-4 py-2 text-center sm:px-5"
       />
     </section>
   );

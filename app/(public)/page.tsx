@@ -1,8 +1,7 @@
 import { DataError } from '@/components/data-error';
-import { CheckIcon, WrenchIcon } from '@/components/icons';
 import { IncidentCard } from '@/components/incident-card';
 import { IncidentRow } from '@/components/incident-row';
-import { MaintenanceCard } from '@/components/maintenance-card';
+import { MaintenanceRow } from '@/components/maintenance-row';
 import { PageHeader } from '@/components/page-header';
 import { SectionHeading } from '@/components/section-heading';
 import { SetupNotice } from '@/components/setup-notice';
@@ -42,22 +41,29 @@ export default async function HomePage() {
 
   if (!snapshot.configured) {
     return (
-      <div className="mx-auto max-w-[1100px] space-y-4 px-4 pt-4 sm:px-6 sm:pt-5">
-        <StatusHero
-          overall={deriveOverallStatus({
-            configured: false,
-            services: [],
-            monitors: [],
-            openIncidents: [],
-            maintenance: [],
-            now,
-          })}
-          lastRun={null}
-          lastCheckAt={null}
-          openIncidents={0}
-          now={now}
-        />
-        <SetupNotice />
+      <div className="mx-auto max-w-[1100px] px-4 pt-5 sm:px-6 sm:pt-8">
+        <h1 className="text-center text-[26px] font-semibold leading-tight tracking-[-0.015em]">
+          FastHand system status
+        </h1>
+        <div className="mt-5">
+          <StatusHero
+            overall={deriveOverallStatus({
+              configured: false,
+              services: [],
+              monitors: [],
+              openIncidents: [],
+              maintenance: [],
+              now,
+            })}
+            lastRun={null}
+            lastCheckAt={null}
+            openIncidents={0}
+            now={now}
+          />
+        </div>
+        <div className="mt-4">
+          <SetupNotice />
+        </div>
       </div>
     );
   }
@@ -97,16 +103,22 @@ export default async function HomePage() {
   const latest = lastCheckAt(snapshot);
 
   return (
-    <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
-      <StatusHero
-        overall={overall}
-        lastRun={snapshot.lastRun}
-        lastCheckAt={latest}
-        openIncidents={snapshot.openIncidents.length}
-        now={now}
-      />
+    <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-5 sm:px-6 sm:pt-8">
+      <h1 className="text-center text-[26px] font-semibold leading-tight tracking-[-0.015em]">
+        FastHand system status
+      </h1>
 
-      <div className="mt-6 space-y-6">
+      <div className="mt-5">
+        <StatusHero
+          overall={overall}
+          lastRun={snapshot.lastRun}
+          lastCheckAt={latest}
+          openIncidents={snapshot.openIncidents.length}
+          now={now}
+        />
+      </div>
+
+      <div className="mt-7 space-y-7">
         <section>
           <SectionHeading title="Active incidents" href="/incidents" linkLabel="Incident log" />
           {activeIncidents.length > 0 ? (
@@ -121,43 +133,32 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center gap-2.5 fh-card border border-line bg-surface px-3.5 py-2.5">
-              <CheckIcon className="h-4 w-4 shrink-0 text-ok" />
-              <p className="min-w-0 text-[15px] text-muted">
-                <span className="font-medium text-ink">No incidents reported.</span>{' '}
-                {snapshot.recentIncidents[0]
-                  ? `Last incident resolved ${formatRelativeTime(snapshot.recentIncidents[0].resolved_at, now)}.`
-                  : 'Nothing has been recorded yet.'}
-              </p>
-            </div>
+            <p className="text-[15px] text-muted">
+              No incidents have been reported
+              {snapshot.recentIncidents[0]
+                ? `; the last one resolved ${formatRelativeTime(snapshot.recentIncidents[0].resolved_at, now)}.`
+                : ' yet.'}
+            </p>
           )}
         </section>
 
         <section>
-          <SectionHeading
-            title="Scheduled maintenance"
-            href="/maintenance"
-            linkLabel="All maintenance"
-          />
+          <SectionHeading title="Active maintenance" href="/maintenance" linkLabel="All maintenance" />
           {upcomingMaintenance.length > 0 ? (
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="overflow-hidden fh-panel border border-line bg-surface">
               {upcomingMaintenance.map((window) => (
-                <MaintenanceCard
+                <MaintenanceRow
                   key={window.id}
                   window={window}
-                  affectedServices={maintenanceNames(window)}
+                  affected={maintenanceNames(window)}
                   now={now}
                 />
               ))}
             </div>
           ) : (
-            <div className="flex items-center gap-2.5 fh-card border border-line bg-surface px-3.5 py-2.5">
-              <WrenchIcon className="h-4 w-4 shrink-0 text-muted" />
-              <p className="text-[15px] text-muted">
-                <span className="font-medium text-ink">No planned maintenance.</span> New windows are
-                announced here before work starts.
-              </p>
-            </div>
+            <p className="text-[15px] text-muted">
+              No maintenance is scheduled. New windows appear here before work starts.
+            </p>
           )}
         </section>
 
