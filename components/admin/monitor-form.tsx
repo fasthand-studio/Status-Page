@@ -22,10 +22,10 @@ export function MonitorForm({
   submitLabel: string;
 }) {
   return (
-    <ActionForm action={action} className={`${adminCardClass} p-5 sm:p-6`}>
+    <ActionForm action={action} className={`${adminCardClass} px-3 py-2 sm:p-4`}>
       {monitor ? <input type="hidden" name="monitor_id" value={monitor.id} /> : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Name" htmlFor="name" required>
           <input
             id="name"
@@ -61,7 +61,7 @@ export function MonitorForm({
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Expected status from" htmlFor="expected_status_min" required>
           <input
             id="expected_status_min"
@@ -102,7 +102,7 @@ export function MonitorForm({
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Timeout (ms)" htmlFor="timeout_ms" required>
           <input
             id="timeout_ms"
@@ -120,7 +120,7 @@ export function MonitorForm({
           label="Check interval (seconds)"
           htmlFor="check_interval_seconds"
           required
-          hint="The default workflow runs every 300 seconds. A shorter value is not honoured automatically."
+          hint="Scheduled checks run every 300 seconds. A shorter value is not honoured automatically."
         >
           <input
             id="check_interval_seconds"
@@ -136,7 +136,7 @@ export function MonitorForm({
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Open after failures" htmlFor="failure_threshold" required hint="Consecutive failed checks.">
           <input
             id="failure_threshold"
@@ -182,15 +182,15 @@ export function MonitorForm({
         </Field>
       </div>
 
-      <div className="space-y-2 fh-r-sm border border-line bg-paper px-3 py-2.5">
-        <label className="flex items-center gap-3 text-[17px] text-ink/85">
+      <div className="space-y-2 fh-r-sm border border-line bg-paper px-3 py-2">
+        <label className="flex items-center gap-3 text-[11.5px] text-ink/85">
           <input
             type="checkbox"
             name="enabled"
             defaultChecked={monitor?.enabled ?? true}
             className="h-4 w-4 accent-primary"
           />
-          Run this monitor on the scheduled workflow
+          Run this monitor on the scheduled check
         </label>
         <p className={adminHintClass}>
           Pausing stops new checks. The public page keeps the last evidence and marks it stale rather than assuming

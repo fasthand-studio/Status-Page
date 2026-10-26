@@ -331,7 +331,7 @@ export function deriveOverallStatus(input: {
       monitoredServices.length === services.length
         ? 'All systems operational'
         : 'All monitored systems operational',
-    detail: `Automated checks cover ${monitoredServices.length} of ${services.length} services. A green row means its last heartbeat passed; it is not proof that every FastHand system is healthy.`,
+    detail: 'Green means stored checks passed — not proof of overall health.',
     tone: 'ok',
     ...counts,
   };

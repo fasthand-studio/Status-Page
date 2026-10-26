@@ -57,6 +57,17 @@ export function formatDateTime(iso: string | null): string {
   }).format(date) + ' UTC';
 }
 
+export function formatClock(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+  return new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC',
+  }).format(date);
+}
+
 export function formatShortDate(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
@@ -105,6 +116,27 @@ export function formatDuration(seconds: number): string {
 export function formatWindow(startIso: string, endIso: string): string {
   return `${formatDateTime(startIso)} → ${formatDateTime(endIso)}`;
 }
+
+export function formatWindowShort(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return formatWindow(startIso, endIso);
+  }
+  const day = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  const time = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC',
+  });
+  const sameDay = start.toISOString().slice(0, 10) === end.toISOString().slice(0, 10);
+  if (sameDay) {
+    return `${day.format(start)} ${time.format(start)}–${time.format(end)} UTC`;
+  }
+  return `${day.format(start)} ${time.format(start)} → ${day.format(end)} ${time.format(end)} UTC`;
+}
+
 
 export function dayKey(date: Date): string {
   return date.toISOString().slice(0, 10);

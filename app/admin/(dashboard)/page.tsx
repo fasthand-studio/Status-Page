@@ -48,7 +48,7 @@ export default async function AdminOverviewPage() {
   const attentionCount = failing.length + stale.length + data.openIncidents.length;
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-5">
       <AdminPageHeader
         title="Overview"
         description="Real checks, real incidents. Nothing here is inferred from the last good result."
@@ -98,16 +98,16 @@ export default async function AdminOverviewPage() {
           {latestRun
             ? `Last run finished ${formatRelativeTime(latestRun.finished_at ?? latestRun.started_at)}.`
             : 'No monitor run has ever been recorded.'}{' '}
-          Check the GitHub Actions workflow history and the repository secrets. Until it runs again, the public page
-          will mark monitored services as unknown rather than green.
+          Check the pg_cron schedule and the vault secret used by the check endpoint. Until it runs again, the public
+          page will mark monitored services as unknown rather than green.
         </Notice>
       ) : null}
 
-      <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+      <section className="grid gap-3 xl:grid-cols-[1.35fr_0.65fr]">
         <div className="space-y-3">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="font-sans text-[20px] font-semibold tracking-[-0.02em]">Needs attention</h2>
-            <p className="font-sans text-[13px] text-muted">
+            <h2 className="font-sans text-[16px] font-semibold tracking-[-0.02em]">Needs attention</h2>
+            <p className="font-sans text-[11.5px] text-muted">
               {attentionCount} item{attentionCount === 1 ? '' : 's'}
             </p>
           </div>
@@ -125,19 +125,19 @@ export default async function AdminOverviewPage() {
                   <Link
                     key={incident.id}
                     href={`/admin/incidents/${incident.id}`}
-                    className={`${adminCardClass} block p-4 transition hover:border-ink/25`}
+                    className={`${adminCardClass} block px-3 py-2 transition hover:border-ink/25`}
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <AdminStatusBadge status={incident.status} />
                       <AdminImpactBadge impact={incident.impact} />
                       {incident.auto_detected ? (
-                        <span className="font-sans text-[13px] text-muted">
+                        <span className="font-sans text-[11.5px] text-muted">
                           Auto-detected
                         </span>
                       ) : null}
                     </div>
                     <p className="mt-2 font-medium text-ink">{incident.title}</p>
-                    <p className="mt-1 text-[15px] text-muted">
+                    <p className="mt-1 text-[12.5px] text-muted">
                       Started {formatRelativeTime(incident.started_at)}
                       {update ? ` · Latest update ${formatRelativeTime(update.created_at)}` : ''}
                     </p>
@@ -149,16 +149,16 @@ export default async function AdminOverviewPage() {
                 <Link
                   key={status.id}
                   href={`/admin/monitors/${status.id}`}
-                  className={`${adminCardClass} flex flex-wrap items-center justify-between gap-3 p-4 transition hover:border-ink/25`}
+                  className={`${adminCardClass} flex flex-wrap items-center justify-between gap-3 px-3 py-2 transition hover:border-ink/25`}
                 >
                   <div>
                     <p className="font-medium text-ink">{status.name}</p>
-                    <p className="mt-1 text-[15px] text-muted">
+                    <p className="mt-1 text-[12.5px] text-muted">
                       Last check failed {formatRelativeTime(status.checked_at)}
                       {status.status_code ? ` · HTTP ${status.status_code}` : ''}
                     </p>
                   </div>
-                  <span className="font-sans text-[13px] text-bad">
+                  <span className="font-sans text-[11.5px] text-bad">
                     Failing
                   </span>
                 </Link>
@@ -168,17 +168,17 @@ export default async function AdminOverviewPage() {
                 <Link
                   key={status.id}
                   href={`/admin/monitors/${status.id}`}
-                  className={`${adminCardClass} flex flex-wrap items-center justify-between gap-3 p-4 transition hover:border-ink/25`}
+                  className={`${adminCardClass} flex flex-wrap items-center justify-between gap-3 px-3 py-2 transition hover:border-ink/25`}
                 >
                   <div>
                     <p className="font-medium text-ink">{status.name}</p>
-                    <p className="mt-1 text-[15px] text-muted">
+                    <p className="mt-1 text-[12.5px] text-muted">
                       {status.checked_at
                         ? `Last check ${formatRelativeTime(status.checked_at)} · expected every ${Math.round(status.check_interval_seconds / 60)} min`
                         : 'No check has been stored yet'}
                     </p>
                   </div>
-                  <span className="font-sans text-[13px] text-warn">
+                  <span className="font-sans text-[11.5px] text-warn">
                     {status.checked_at ? 'Stale' : 'Waiting'}
                   </span>
                 </Link>
@@ -188,27 +188,27 @@ export default async function AdminOverviewPage() {
         </div>
 
         <aside className="space-y-3">
-          <h2 className="font-sans text-[20px] font-semibold tracking-[-0.02em]">Runner</h2>
+          <h2 className="font-sans text-[16px] font-semibold tracking-[-0.02em]">Runner</h2>
           <div className={`${adminCardClass} divide-y divide-line`}>
             {data.runs.length === 0 ? (
-              <p className="p-4 text-[17px] text-muted">
-                No monitor runs yet. Trigger the workflow once from GitHub Actions, or run{' '}
+              <p className="px-3 py-2 text-[11.5px] text-muted">
+                No monitor runs yet. Trigger the scheduled check from the database, or run{' '}
                 <span className="font-sans text-ink/85">npm run checks</span> locally with the service-role key.
               </p>
             ) : (
               data.runs.map((run) => (
-                <div key={run.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div key={run.id} className="flex items-center justify-between gap-3 px-3 py-2">
                   <div>
-                    <p className="text-[17px] text-ink/85">{formatDateTime(run.started_at)}</p>
-                    <p className="mt-0.5 font-sans text-[13px] text-muted">
+                    <p className="text-[11.5px] text-ink/85">{formatDateTime(run.started_at)}</p>
+                    <p className="mt-0.5 font-sans text-[11.5px] text-muted">
                       {run.source}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-sans text-[15px] text-ink/85">
+                    <p className="font-sans text-[12.5px] text-ink/85">
                       {run.checks_run} check{run.checks_run === 1 ? '' : 's'}
                     </p>
-                    <p className={`font-sans text-[13px] ${run.failures > 0 ? 'text-bad' : 'text-muted'}`}>
+                    <p className={`font-sans text-[11.5px] ${run.failures > 0 ? 'text-bad' : 'text-muted'}`}>
                       {run.failures} failed
                     </p>
                   </div>
@@ -216,16 +216,16 @@ export default async function AdminOverviewPage() {
               ))
             )}
           </div>
-          <p className="text-[15px] leading-relaxed text-muted">
-            Default cadence is every 5 minutes via GitHub Actions. GitHub can delay scheduled runs under load; the
-            public page treats late checks as unknown instead of assuming health.
+          <p className="text-[12.5px] leading-relaxed text-muted">
+            Default cadence is every 5 minutes via pg_cron. Postgres can delay jobs under load; the public page treats
+            late checks as unknown instead of assuming health.
           </p>
         </aside>
       </section>
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="font-sans text-[20px] font-semibold tracking-[-0.02em]">Monitors</h2>
+          <h2 className="font-sans text-[16px] font-semibold tracking-[-0.02em]">Monitors</h2>
           <Link href="/admin/monitors" className={linkClass}>
             Manage monitors
           </Link>
@@ -237,34 +237,34 @@ export default async function AdminOverviewPage() {
           </EmptyAdminState>
         ) : (
           <div className={`${adminCardClass} overflow-x-auto`}>
-            <table className="w-full min-w-[640px] text-left text-[17px]">
+            <table className="w-full min-w-[640px] text-left text-[12.5px]">
               <thead>
-                <tr className="border-b border-line font-sans text-[13px] text-muted">
-                  <th className="px-4 py-2.5 font-medium">Monitor</th>
-                  <th className="px-4 py-2.5 font-medium">State</th>
-                  <th className="px-4 py-2.5 font-medium">Last check</th>
-                  <th className="px-4 py-2.5 font-medium">Response</th>
-                  <th className="px-4 py-2.5 font-medium">Cadence</th>
-                  <th className="px-4 py-2.5" />
+                <tr className="border-b border-line font-sans text-[11.5px] text-muted">
+                  <th className="px-3 py-2 font-medium">Monitor</th>
+                  <th className="px-3 py-2 font-medium">State</th>
+                  <th className="px-3 py-2 font-medium">Last check</th>
+                  <th className="px-3 py-2 font-medium">Response</th>
+                  <th className="px-3 py-2 font-medium">Cadence</th>
+                  <th className="px-3 py-2" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {data.statuses.map((status) => (
                   <tr key={status.id} className="transition hover:bg-ink/[0.03]">
-                    <td className="px-4 py-3 font-medium text-ink/85">{status.name}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2 font-medium text-ink/85">{status.name}</td>
+                    <td className="px-3 py-2">
                       <MonitorState status={status} />
                     </td>
-                    <td className="px-4 py-3 text-muted">
+                    <td className="px-3 py-2 text-muted">
                       {status.checked_at ? formatRelativeTime(status.checked_at) : 'Never'}
                     </td>
-                    <td className="px-4 py-3 font-sans text-[15px] text-muted">
+                    <td className="px-3 py-2 font-sans text-[12.5px] text-muted">
                       {status.response_time_ms === null ? '—' : `${status.response_time_ms} ms`}
                     </td>
-                    <td className="px-4 py-3 font-sans text-[15px] text-muted">
+                    <td className="px-3 py-2 font-sans text-[12.5px] text-muted">
                       {Math.round(status.check_interval_seconds / 60)} min
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-3 py-2 text-right">
                       <Link href={`/admin/monitors/${status.id}`} className={linkClass}>
                         Open
                       </Link>
@@ -280,7 +280,7 @@ export default async function AdminOverviewPage() {
       {data.recentIncidents.length > 0 ? (
         <section className="space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="font-sans text-[20px] font-semibold tracking-[-0.02em]">Recently resolved</h2>
+            <h2 className="font-sans text-[16px] font-semibold tracking-[-0.02em]">Recently resolved</h2>
             <Link href="/admin/incidents" className={linkClass}>
               All incidents
             </Link>
@@ -290,10 +290,10 @@ export default async function AdminOverviewPage() {
               <Link
                 key={incident.id}
                 href={`/admin/incidents/${incident.id}`}
-                className={`${adminCardClass} p-4 transition hover:border-ink/25`}
+                className={`${adminCardClass} px-3 py-2 transition hover:border-ink/25`}
               >
                 <p className="font-medium text-ink/85">{incident.title}</p>
-                <p className="mt-1 text-[15px] text-muted">
+                <p className="mt-1 text-[12.5px] text-muted">
                   Resolved {formatRelativeTime(incident.resolved_at)} · {incident.incident_updates.length} update
                   {incident.incident_updates.length === 1 ? '' : 's'}
                 </p>
@@ -303,7 +303,7 @@ export default async function AdminOverviewPage() {
         </section>
       ) : null}
 
-      <p className="text-[15px] leading-relaxed text-muted">
+      <p className="text-[12.5px] leading-relaxed text-muted">
         This page is private, excluded from search engines, and never linked from the public status page.
       </p>
     </div>

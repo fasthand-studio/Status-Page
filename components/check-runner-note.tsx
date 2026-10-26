@@ -15,8 +15,8 @@ export function CheckRunnerNote({
 }) {
   if (!lastRun) {
     return (
-      <p className={cn('text-[15px] leading-relaxed text-muted', className)}>
-        No automated check pass has been recorded yet. This page will stay honest until one runs.
+      <p className={cn('text-[12px] leading-relaxed text-muted', className)}>
+        No automated check pass has been recorded yet.
       </p>
     );
   }
@@ -32,11 +32,10 @@ export function CheckRunnerNote({
   );
 
   return (
-    <p className={cn('text-[15px] leading-relaxed', delayed ? 'text-warn' : 'text-muted', className)}>
+    <p className={cn('text-[12px] leading-relaxed fh-num', delayed ? 'text-warn' : 'text-muted', className)}>
       {lastCheckAt ? (
         <>
-          Last check{' '}
-          <strong className="font-medium text-ink/80">{formatRelativeTime(lastCheckAt, now)}</strong>
+          Last check <strong className="font-medium text-ink/80">{formatRelativeTime(lastCheckAt, now)}</strong>
           <span aria-hidden="true"> · </span>
         </>
       ) : null}

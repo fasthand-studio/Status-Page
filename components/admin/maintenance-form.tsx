@@ -37,10 +37,10 @@ export function MaintenanceForm({
   const selected = window?.maintenance_services.map((row) => row.service_id) ?? [];
 
   return (
-    <ActionForm action={action} className={`${adminCardClass} p-5 sm:p-6`}>
+    <ActionForm action={action} className={`${adminCardClass} px-3 py-2 sm:p-4`}>
       {window ? <input type="hidden" name="maintenance_id" value={window.id} /> : null}
 
-      <div className="grid gap-4 sm:grid-cols-[1.4fr_0.6fr]">
+      <div className="grid gap-3 sm:grid-cols-[1.4fr_0.6fr]">
         <Field label="Title" htmlFor="title" required>
           <input
             id="title"
@@ -68,7 +68,7 @@ export function MaintenanceForm({
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Starts (UTC)" htmlFor="scheduled_start" required>
           <input
             id="scheduled_start"
@@ -106,7 +106,7 @@ export function MaintenanceForm({
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-        <p className="text-[15px] text-muted">
+        <p className="text-[12.5px] text-muted">
           Cancelled and completed windows stay in the public archive.
         </p>
         <SubmitButton pendingLabel="Saving…">{submitLabel}</SubmitButton>

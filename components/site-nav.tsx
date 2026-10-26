@@ -18,7 +18,10 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
   return (
     <nav
       aria-label="Status sections"
-      className={cn('flex items-center gap-1', compact && 'w-full overflow-x-auto py-1.5 no-scrollbar')}
+      className={cn(
+        'flex items-stretch',
+        compact ? 'gap-0.5 overflow-x-auto no-scrollbar' : 'h-full gap-5',
+      )}
     >
       {ITEMS.map((item) => {
         const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
@@ -28,11 +31,20 @@ export function SiteNav({ compact = false }: { compact?: boolean }) {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'fh-pill-lg relative whitespace-nowrap transition-colors',
-              active ? 'bg-primary font-semibold text-white' : 'text-muted hover:bg-ink/[0.05] hover:text-ink',
+              'relative flex shrink-0 items-center whitespace-nowrap font-medium transition-colors',
+              compact ? 'h-9 px-2 text-[12.5px]' : 'h-12 text-[13px]',
+              active ? 'text-primary' : 'text-muted hover:text-ink',
             )}
           >
             {item.label}
+            <span
+              className={cn(
+                'absolute inset-x-0 bottom-0 h-[2px] transition-colors',
+                compact && 'inset-x-1.5',
+                active ? 'bg-primary' : 'bg-transparent',
+              )}
+              aria-hidden="true"
+            />
           </Link>
         );
       })}

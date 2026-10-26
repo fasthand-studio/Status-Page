@@ -3,10 +3,10 @@ import { IMPACT_LABEL } from '@/lib/status';
 import type { IncidentImpact, IncidentStatus } from '@/lib/types';
 
 const STATUS_TONE: Record<IncidentStatus, string> = {
-  investigating: 'border-bad/25 bg-bad-soft text-bad',
-  identified: 'border-warn/25 bg-warn-soft text-warn',
-  monitoring: 'border-info/20 bg-info-soft text-info',
-  resolved: 'border-ok/25 bg-ok-soft text-ok',
+  investigating: 'bg-bad-soft text-bad',
+  identified: 'bg-warn-soft text-warn',
+  monitoring: 'bg-info-soft text-info',
+  resolved: 'bg-ok-soft text-ok',
 };
 
 const STATUS_LABEL: Record<IncidentStatus, string> = {
@@ -17,10 +17,10 @@ const STATUS_LABEL: Record<IncidentStatus, string> = {
 };
 
 const IMPACT_TONE: Record<IncidentImpact, string> = {
-  critical: 'border-bad/25 bg-bad-soft text-bad',
-  major: 'border-warn/25 bg-warn-soft text-warn',
-  minor: 'border-info/20 bg-info-soft text-info',
-  none: 'border-line bg-ink/[0.04] text-muted',
+  critical: 'bg-bad-soft text-bad',
+  major: 'bg-warn-soft text-warn',
+  minor: 'bg-info-soft text-info',
+  none: 'bg-surface-soft text-muted',
 };
 
 export function IncidentStatusBadge({
@@ -30,7 +30,7 @@ export function IncidentStatusBadge({
   size?: 'sm' | 'md';
 }) {
   return (
-    <span className={cn('fh-pill border font-medium', STATUS_TONE[status])}>
+    <span className={cn('fh-pill font-medium', STATUS_TONE[status])}>
       {STATUS_LABEL[status]}
     </span>
   );
@@ -38,7 +38,7 @@ export function IncidentStatusBadge({
 
 export function ImpactBadge({ impact }: { impact: IncidentImpact; size?: 'sm' | 'md' }) {
   return (
-    <span className={cn('fh-pill border font-medium', IMPACT_TONE[impact])}>
+    <span className={cn('fh-pill font-medium', IMPACT_TONE[impact])}>
       {impact === 'none' ? 'No impact' : `${IMPACT_LABEL[impact]} impact`}
     </span>
   );

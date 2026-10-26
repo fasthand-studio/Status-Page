@@ -15,7 +15,7 @@ const TONE = {
 
 function StatusDot({ className }: { className: string }) {
   return (
-    <svg viewBox="0 0 12 12" aria-hidden="true" className={cn('h-3 w-3 shrink-0', className)}>
+    <svg viewBox="0 0 12 12" aria-hidden="true" className={cn('h-2.5 w-2.5 shrink-0', className)}>
       <circle cx="6" cy="6" r="6" fill="currentColor" />
     </svg>
   );
@@ -23,10 +23,10 @@ function StatusDot({ className }: { className: string }) {
 
 function Fact({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div>
-      <dt className="text-[13px] text-muted">{label}</dt>
-      <dd className="mt-0.5 text-[17px] font-semibold leading-tight tracking-[-0.01em]">{value}</dd>
-    </div>
+    <span className="inline-flex items-baseline gap-1">
+      <span>{label}</span>
+      <strong className="fh-num font-medium text-ink/80">{value}</strong>
+    </span>
   );
 }
 
@@ -46,49 +46,37 @@ export function StatusHero({
   const tone = TONE[overall.tone];
 
   return (
-    <section className="fh-panel border border-line bg-surface px-5 py-5 sm:px-6 sm:py-6">
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0">
-          <h1 className="flex items-center gap-2.5 text-[clamp(1.4rem,2.4vw,1.85rem)] font-semibold leading-tight tracking-[-0.03em]">
-            <StatusDot className={tone} />
-            <span>{overall.label}</span>
-          </h1>
-          <p className="mt-2 max-w-2xl text-[17px] leading-relaxed text-muted">{overall.detail}</p>
+    <section className="fh-panel border border-line bg-surface">
+      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 px-4 py-3.5 sm:px-5">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <StatusDot className={cn('mt-1.5', tone)} />
+          <div className="min-w-0">
+            <h1 className="text-[18px] font-semibold leading-tight tracking-[-0.01em]">
+              {overall.label}
+            </h1>
+            {overall.detail && (
+              <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-muted">{overall.detail}</p>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-1 text-[15px] text-muted sm:items-end">
+        <div className="flex flex-col gap-0.5 text-[11.5px] text-muted sm:items-end">
           <AutoRefresh />
-          <span>Checks every 5 min · all times UTC</span>
+          <span>Checks every 5 min</span>
         </div>
       </div>
 
-      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 sm:grid-cols-4">
-        <Fact
-          label="Monitored"
-          value={
-            <>
-              {overall.monitoredCount}
-              <span className="font-normal text-muted/60"> / {overall.totalServices}</span>
-            </>
-          }
-        />
-        <Fact
-          label="Fresh checks"
-          value={
-            <>
-              {overall.freshCount}
-              <span className="font-normal text-muted/60"> / {overall.monitoredCount}</span>
-            </>
-          }
-        />
-        <Fact label="Stale checks" value={overall.staleCount} />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line px-4 py-2 text-[11.5px] text-muted sm:px-5">
+        <Fact label="Monitored" value={`${overall.monitoredCount} / ${overall.totalServices}`} />
+        <Fact label="Fresh" value={`${overall.freshCount} / ${overall.monitoredCount}`} />
+        <Fact label="Stale" value={overall.staleCount} />
         <Fact label="Open incidents" value={openIncidents} />
-      </dl>
+      </div>
 
       <CheckRunnerNote
         lastRun={lastRun}
         now={now}
         lastCheckAt={lastCheckAt}
-        className="mt-3"
+        className="border-t border-line px-4 py-2 sm:px-5"
       />
     </section>
   );

@@ -24,31 +24,27 @@ export function ServiceSummaryRow({
   return (
     <Link
       href={`/services#service-${service.slug}`}
-      className="group flex items-center gap-3 px-4 py-4 transition-colors hover:bg-ink/[0.025] sm:gap-4 sm:px-5"
+      className="group grid grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-x-2.5 px-4 py-2.5 transition-colors hover:bg-surface-soft sm:grid-cols-[18px_minmax(0,1fr)_150px_64px] sm:px-5"
     >
       <ServiceIcon slug={service.slug} />
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-[16px] font-medium tracking-[-0.01em]">{service.name}</h3>
-          <StatusPill state={health.state} size="sm" />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <h3 className="truncate text-[13.5px] font-medium">{service.name}</h3>
+          <StatusPill state={health.state} />
         </div>
-        <p className="mt-1 truncate text-[15px] text-muted">{health.detail}</p>
+        <p className="mt-0.5 truncate text-[11.5px] text-muted">
+          {lastCheckAt ? `Checked ${formatRelativeTime(lastCheckAt, now)}` : health.detail}
+        </p>
       </div>
 
-      <div className="hidden w-[150px] shrink-0 sm:block">
+      <div className="hidden sm:block">
         <UptimeBars bars={bars} label={service.name} compact showLabels={false} />
       </div>
 
-      <div className="hidden w-[74px] shrink-0 text-right md:block">
-        <p className="font-sans text-[15px] text-ink/85">{formatUptime(uptime.percent)}</p>
-        <p className="mt-0.5 font-sans text-[13px] text-muted">30 days</p>
-      </div>
-
-      <div className="hidden w-24 shrink-0 text-right lg:block">
-        <p className="text-[15px] text-muted">
-          {lastCheckAt ? formatRelativeTime(lastCheckAt, now) : 'No check'}
-        </p>
+      <div className="text-right">
+        <p className="fh-num text-[12.5px] text-ink/85">{formatUptime(uptime.percent)}</p>
+        <p className="text-[11px] text-muted">30d</p>
       </div>
     </Link>
   );

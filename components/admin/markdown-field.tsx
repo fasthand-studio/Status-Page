@@ -35,7 +35,7 @@ export function MarkdownField({
           <span>{label}</span>
           <span
             className={cn(
-              'font-sans text-[13px] font-semibold',
+              'font-sans text-[11.5px] font-semibold',
               required ? 'text-ink' : 'text-muted',
             )}
           >
@@ -76,11 +76,11 @@ export function MarkdownField({
       />
 
       {tab === 'preview' ? (
-        <div className="min-h-[9rem] fh-r-sm border border-line bg-paper px-4 py-3">
+        <div className="min-h-[7rem] fh-r-sm border border-line bg-paper px-3 py-2">
           {value.trim() ? (
             <Markdown>{value}</Markdown>
           ) : (
-            <p className="text-[17px] text-muted">Nothing to preview yet.</p>
+            <p className="text-[11.5px] text-muted">Nothing to preview yet.</p>
           )}
         </div>
       ) : null}

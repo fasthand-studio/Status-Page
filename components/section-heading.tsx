@@ -12,16 +12,13 @@ export function SectionHeading({
   linkLabel?: string;
 }) {
   return (
-    <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
       <div>
-        <h2 className="text-[24px] font-semibold leading-tight tracking-[-0.02em]">{title}</h2>
-        {description && <p className="mt-1 max-w-xl text-[15px] text-muted">{description}</p>}
+        <h2 className="text-[15px] font-semibold leading-tight">{title}</h2>
+        {description && <p className="mt-0.5 max-w-2xl text-[12px] text-muted">{description}</p>}
       </div>
       {href && (
-        <Link
-          href={href}
-          className="text-[17px] font-medium underline decoration-primary-deep decoration-2 underline-offset-4 hover:decoration-ink"
-        >
+        <Link href={href} className="text-[12px] font-medium text-primary hover:underline">
           {linkLabel ?? 'View all'}
         </Link>
       )}

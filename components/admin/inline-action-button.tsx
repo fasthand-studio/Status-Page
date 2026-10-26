@@ -28,8 +28,8 @@ export function InlineActionButton({
       <button type="submit" disabled={pending} aria-busy={pending} className={smallButtonClass}>
         {pending ? pendingLabel : label}
       </button>
-      {state.error ? <span className="max-w-[16rem] text-[15px] leading-tight text-bad">{state.error}</span> : null}
-      {state.success ? <span className="max-w-[16rem] text-[15px] leading-tight text-ok">{state.success}</span> : null}
+      {state.error ? <span className="max-w-[16rem] text-[12.5px] leading-tight text-bad">{state.error}</span> : null}
+      {state.success ? <span className="max-w-[16rem] text-[12.5px] leading-tight text-ok">{state.success}</span> : null}
     </form>
   );
 }

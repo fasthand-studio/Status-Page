@@ -54,7 +54,7 @@ export default async function AdminMonitorPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/monitors" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
+      <Link href="/admin/monitors" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All monitors
       </Link>
@@ -75,7 +75,7 @@ export default async function AdminMonitorPage({
         description={
           <span className="flex flex-wrap items-center gap-2">
             <MonitorState status={status} />
-            <span className="break-all font-sans text-[15px] text-muted">{monitor.url}</span>
+            <span className="break-all font-sans text-[12.5px] text-muted">{monitor.url}</span>
           </span>
         }
         actions={
@@ -96,26 +96,26 @@ export default async function AdminMonitorPage({
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.9fr]">
+      <div className="grid gap-3 xl:grid-cols-[1.25fr_0.9fr]">
         <MonitorForm action={updateMonitorAction} monitor={monitor} submitLabel="Save monitor" />
 
         <aside className="space-y-4">
-          <section className={`${adminCardClass} p-4`}>
+          <section className={`${adminCardClass} px-3 py-2`}>
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="font-sans text-[18px] font-semibold">Recent checks</h2>
+              <h2 className="font-sans text-[13.5px] font-semibold">Recent checks</h2>
               <Link href="/admin/services" className={linkClass}>
                 Services
               </Link>
             </div>
             {recent.length === 0 ? (
-              <p className="mt-3 text-[17px] leading-relaxed text-muted">
-                No checks stored yet. Run the workflow or use “Run check now” once the URL is verified.
+              <p className="mt-2 text-[11.5px] leading-relaxed text-muted">
+                No checks stored yet. Use “Run check now” once the URL is verified.
               </p>
             ) : (
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[420px] text-left text-[15px]">
+              <div className="mt-2 overflow-x-auto">
+                <table className="w-full min-w-[420px] text-left text-[12.5px]">
                   <thead>
-                    <tr className="border-b border-line font-sans text-[13px] text-muted">
+                    <tr className="border-b border-line font-sans text-[11.5px] text-muted">
                       <th className="py-2 pr-2 font-medium">Time</th>
                       <th className="py-2 pr-2 font-medium">Result</th>
                       <th className="py-2 pr-2 font-medium">HTTP</th>
@@ -130,7 +130,7 @@ export default async function AdminMonitorPage({
                         </td>
                         <td className="py-2 pr-2 align-top">
                           <span
-                            className={`font-sans text-[13px] ${
+                            className={`font-sans text-[11.5px] ${
                               check.ok ? 'text-ok' : 'text-bad'
                             }`}
                           >
@@ -149,13 +149,13 @@ export default async function AdminMonitorPage({
             )}
 
             {recent.some((check) => check.error || check.body_excerpt) ? (
-              <div className="mt-3 space-y-2 border-t border-line pt-3">
+              <div className="mt-2 space-y-2 border-t border-line pt-3">
                 {recent
                   .filter((check) => check.error || check.body_excerpt)
                   .slice(0, 3)
                   .map((check) => (
-                    <div key={`detail-${check.id}`} className="text-[15px] leading-relaxed text-muted">
-                      <span className="font-sans text-[13px] text-muted">
+                    <div key={`detail-${check.id}`} className="text-[12.5px] leading-relaxed text-muted">
+                      <span className="font-sans text-[11.5px] text-muted">
                         {formatDateTime(check.checked_at)}
                       </span>
                       {check.error ? <p className="text-bad">{check.error}</p> : null}
@@ -168,9 +168,9 @@ export default async function AdminMonitorPage({
             ) : null}
           </section>
 
-          <section className={`${adminCardClass} p-4`}>
-            <p className="font-sans text-[13px] text-muted">How automation behaves</p>
-            <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-muted">
+          <section className={`${adminCardClass} px-3 py-2`}>
+            <p className="font-sans text-[11.5px] text-muted">How automation behaves</p>
+            <ul className="mt-2 space-y-2 text-[12.5px] leading-relaxed text-muted">
               <li>
                 Opens an incident after <strong className="text-ink/85">{monitor.failure_threshold}</strong> consecutive
                 failures, once no other incident is open for this monitor.

@@ -11,7 +11,7 @@ const TONE_CLASS = {
   'ok-soft': 'bg-ok/70',
   warn: 'bg-warn',
   bad: 'bg-bad',
-  empty: 'bg-ink/10',
+  empty: 'bg-[#dfe3e8]',
 } as const;
 
 export function UptimeBars({
@@ -32,21 +32,19 @@ export function UptimeBars({
   const okChecks = bars.reduce((total, bar) => total + bar.okChecks, 0);
   const percent = totalChecks > 0 ? (okChecks / totalChecks) * 100 : null;
   const active = hovered !== null ? bars[hovered] : null;
-  const left = hovered !== null ? Math.min(Math.max((hovered / Math.max(1, bars.length - 1)) * 100, 9), 91) : 0;
+  const left = hovered !== null ? Math.min(Math.max((hovered / Math.max(1, bars.length - 1)) * 100, 10), 90) : 0;
 
   return (
     <div className={cn('w-full', className)}>
       <div className="relative" onMouseLeave={() => setHovered(null)}>
         {active && (
           <div
-            className="pointer-events-none absolute -top-12 z-20 -translate-x-1/2 fh-r-sm border border-ink bg-ink px-2.5 py-1.5 font-sans text-[13px] leading-tight text-paper "
+            className="pointer-events-none absolute -top-10 z-20 -translate-x-1/2 whitespace-nowrap rounded-[4px] border border-line bg-surface px-2 py-1 text-[11px] leading-tight text-ink shadow-sm"
             style={{ left: `${left}%` }}
             role="status"
           >
-            <span className="block text-[13px] text-paper/60">
-              {formatDayLabel(active.day)}
-            </span>
-            <span className="mt-0.5 block">
+            <span className="block text-muted">{formatDayLabel(active.day)}</span>
+            <span className="mt-0.5 block fh-num">
               {active.percent === null ? 'No checks recorded' : `${formatUptime(active.percent)} uptime`}
               {active.checks > 0 && ` · ${active.checks} checks`}
             </span>
@@ -56,7 +54,7 @@ export function UptimeBars({
         <div
           role="img"
           aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days, ${totalChecks} checks recorded`}
-          className={cn('flex items-stretch gap-[2px]', compact ? 'h-5' : 'h-7')}
+          className={cn('flex items-stretch gap-[2px]', compact ? 'h-4' : 'h-[26px]')}
         >
           {bars.map((bar, index) => (
             <div
@@ -73,7 +71,7 @@ export function UptimeBars({
       </div>
 
       {showLabels && (
-        <div className="mt-1.5 flex items-center justify-between font-sans text-[13px] text-muted">
+        <div className="mt-1 flex items-center justify-between text-[11px] text-muted">
           <span>{bars.length} days ago</span>
           <span>Today</span>
         </div>

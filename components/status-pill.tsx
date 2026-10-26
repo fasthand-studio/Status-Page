@@ -3,13 +3,13 @@ import { HEALTH_LABEL } from '@/lib/status';
 import type { HealthState } from '@/lib/types';
 
 const TONES: Record<HealthState | 'setup', string> = {
-  operational: 'border-ok/25 bg-ok-soft/80 text-ok',
-  degraded: 'border-warn/25 bg-warn-soft text-warn',
-  outage: 'border-bad/25 bg-bad-soft text-bad',
-  maintenance: 'border-info/20 bg-info-soft text-info',
-  unknown: 'border-line bg-ink/[0.04] text-muted',
-  unmonitored: 'border-dashed border-line bg-transparent text-muted',
-  setup: 'border-line bg-ink/[0.04] text-muted',
+  operational: 'bg-ok-soft text-ok',
+  degraded: 'bg-warn-soft text-warn',
+  outage: 'bg-bad-soft text-bad',
+  maintenance: 'bg-info-soft text-info',
+  unknown: 'bg-surface-soft text-muted',
+  unmonitored: 'bg-surface-soft text-muted',
+  setup: 'bg-surface-soft text-muted',
 };
 
 const LABELS: Record<HealthState | 'setup', string> = {
@@ -28,13 +28,7 @@ export function StatusPill({
   size?: 'sm' | 'md';
 }) {
   return (
-    <span
-      className={cn(
-        'fh-pill border font-medium',
-        TONES[state],
-        className,
-      )}
-    >
+    <span className={cn('fh-pill font-medium', TONES[state], className)}>
       <span className="h-1.5 w-1.5 fh-round bg-current" aria-hidden="true" />
       {label ?? LABELS[state]}
     </span>

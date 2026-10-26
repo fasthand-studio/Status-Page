@@ -47,7 +47,7 @@ export default async function AdminMaintenancePage({
   const past = data.windows.filter((window) => !upcoming.includes(window));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title="Maintenance"
         description="Scheduled windows appear on the public maintenance page and can mark affected services as in maintenance."
@@ -63,23 +63,23 @@ export default async function AdminMaintenancePage({
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-sans text-[18px] font-semibold">Upcoming & active</h2>
-          <p className="font-sans text-[13px] text-muted">{upcoming.length}</p>
+          <h2 className="font-sans text-[13.5px] font-semibold">Upcoming & active</h2>
+          <p className="font-sans text-[11.5px] text-muted">{upcoming.length}</p>
         </div>
         {upcoming.length === 0 ? (
           <Notice tone="info">No upcoming maintenance windows.</Notice>
         ) : (
           <div className="space-y-2">
             {upcoming.map((window) => (
-              <article key={window.id} className={`${adminCardClass} p-4`}>
+              <article key={window.id} className={`${adminCardClass} px-3 py-2`}>
                 <div className="flex flex-wrap items-center gap-2">
                   <AdminMaintenanceBadge status={window.status} />
-                  <span className="text-[15px] text-muted">{window.maintenance_services.length} services</span>
+                  <span className="text-[12.5px] text-muted">{window.maintenance_services.length} services</span>
                 </div>
                 <p className="mt-2 font-medium text-ink">{window.title}</p>
-                <p className="mt-1 text-[15px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</p>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-                  <Link href={`/admin/maintenance/${window.id}`} className={`${linkClass} text-[15px]`}>
+                <p className="mt-1 text-[12.5px] text-muted">{formatWindow(window.scheduled_start, window.scheduled_end)}</p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
+                  <Link href={`/admin/maintenance/${window.id}`} className={`${linkClass} text-[12.5px]`}>
                     Open window
                   </Link>
                   <DeleteButton
@@ -96,8 +96,8 @@ export default async function AdminMaintenancePage({
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-sans text-[18px] font-semibold">Archive</h2>
-          <p className="font-sans text-[13px] text-muted">{past.length}</p>
+          <h2 className="font-sans text-[13.5px] font-semibold">Archive</h2>
+          <p className="font-sans text-[11.5px] text-muted">{past.length}</p>
         </div>
         {past.length === 0 ? (
           <EmptyAdminState title="No past maintenance">
@@ -105,30 +105,30 @@ export default async function AdminMaintenancePage({
           </EmptyAdminState>
         ) : (
           <div className={`${adminCardClass} overflow-x-auto`}>
-            <table className="w-full min-w-[760px] text-left text-[17px]">
+            <table className="w-full min-w-[760px] text-left text-[12.5px]">
               <thead>
-                <tr className="border-b border-line font-sans text-[13px] text-muted">
-                  <th className="px-4 py-2.5 font-medium">Window</th>
-                  <th className="px-4 py-2.5 font-medium">Status</th>
-                  <th className="px-4 py-2.5 font-medium">Scheduled</th>
-                  <th className="px-4 py-2.5 font-medium">Services</th>
-                  <th className="px-4 py-2.5" />
+                <tr className="border-b border-line font-sans text-[11.5px] text-muted">
+                  <th className="px-3 py-2 font-medium">Window</th>
+                  <th className="px-3 py-2 font-medium">Status</th>
+                  <th className="px-3 py-2 font-medium">Scheduled</th>
+                  <th className="px-3 py-2 font-medium">Services</th>
+                  <th className="px-3 py-2" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {past.map((window) => (
                   <tr key={window.id} className="transition hover:bg-ink/[0.03]">
-                    <td className="px-4 py-3 font-medium text-ink/85">{window.title}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2 font-medium text-ink/85">{window.title}</td>
+                    <td className="px-3 py-2">
                       <AdminMaintenanceBadge status={window.status} />
                     </td>
-                    <td className="px-4 py-3 text-[15px] text-muted">
+                    <td className="px-3 py-2 text-[12.5px] text-muted">
                       {formatWindow(window.scheduled_start, window.scheduled_end)}
                     </td>
-                    <td className="px-4 py-3 font-sans text-[15px] text-muted">
+                    <td className="px-3 py-2 font-sans text-[12.5px] text-muted">
                       {window.maintenance_services.length}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2">
                       <div className="flex flex-wrap items-center justify-end gap-3">
                         <Link href={`/admin/maintenance/${window.id}`} className={linkClass}>
                           Open

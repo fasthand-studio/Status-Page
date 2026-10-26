@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { DataError } from '@/components/data-error';
-import { MaintenanceCard } from '@/components/maintenance-card';
+import { ChevronDownIcon } from '@/components/icons';
+import { Markdown } from '@/components/markdown';
 import { PageHeader } from '@/components/page-header';
+import { SectionHeading } from '@/components/section-heading';
 import { SetupNotice } from '@/components/setup-notice';
 import { getMaintenanceHistory, getServiceDirectory } from '@/lib/data';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatWindowShort } from '@/lib/format';
+import { maintenancePhase, MAINTENANCE_PHASE_TONE } from '@/lib/maintenance';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import type { MaintenanceWithServices } from '@/lib/types';
 
@@ -12,6 +16,64 @@ export const metadata: Metadata = {
   title: 'Maintenance',
   description: 'Scheduled and completed maintenance windows for FastHand services, in UTC.',
 };
+
+function MaintenanceRow({
+  window,
+  affected,
+  now,
+}: {
+  window: MaintenanceWithServices;
+  affected: string[];
+  now: Date;
+}) {
+  const current = maintenancePhase(window, now);
+
+  return (
+    <details className="group border-b border-line last:border-b-0">
+      <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto_14px] items-center gap-x-3 px-3.5 py-2.5 transition-colors hover:bg-surface-soft sm:grid-cols-[150px_minmax(0,1fr)_auto_14px] [&::-webkit-details-marker]:hidden">
+        <span className="fh-num hidden text-[11.5px] text-muted sm:block">
+          {formatWindowShort(window.scheduled_start, window.scheduled_end)}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-medium">{window.title}</p>
+          <p className="mt-0.5 truncate text-[11.5px] text-muted">
+            <span className="fh-num sm:hidden">
+              {formatWindowShort(window.scheduled_start, window.scheduled_end)} ·{' '}
+            </span>
+            {affected.length > 0 ? affected.join(' · ') : 'No services linked'}
+          </p>
+        </div>
+        <span className={`fh-pill font-medium ${MAINTENANCE_PHASE_TONE[current.key]}`}>{current.label}</span>
+        <ChevronDownIcon className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-line bg-surface-soft px-3.5 py-3 sm:pl-[162px]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-muted">
+          <span className="fh-num">{current.note}</span>
+          <span className="h-3 w-px bg-line" aria-hidden="true" />
+          <span className="fh-num">Recorded {formatDateTime(window.created_at)}</span>
+        </div>
+        <div className="mt-1.5">
+          {window.body ? (
+            <Markdown className="max-w-3xl">{window.body}</Markdown>
+          ) : (
+            <p className="text-[12px] text-muted">No notes were attached beyond the window itself.</p>
+          )}
+        </div>
+        {affected.length > 0 && (
+          <p className="mt-2 text-[12px] text-muted">Affects {affected.join(', ')}.</p>
+        )}
+      </div>
+    </details>
+  );
+}
+
+function EmptyRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="fh-card border border-line bg-surface px-3.5 py-2.5 text-[12.5px] text-muted">
+      {children}
+    </div>
+  );
+}
 
 export default async function MaintenancePage() {
   const configured = isSupabaseConfigured;
@@ -21,12 +83,12 @@ export default async function MaintenancePage() {
 
   if (!configured) {
     return (
-      <div className="mx-auto max-w-[1180px] px-4 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1100px] px-4 pt-4 sm:px-6">
         <PageHeader
           title="Maintenance"
           description="Maintenance announcements appear once the monitoring database is connected."
         />
-        <div className="mt-6">
+        <div className="mt-4">
           <SetupNotice />
         </div>
       </div>
@@ -58,65 +120,46 @@ export default async function MaintenancePage() {
     .sort((a, b) => +new Date(b.scheduled_start) - +new Date(a.scheduled_start));
 
   return (
-    <div className="mx-auto max-w-[1180px] px-4 pb-8 pt-6 sm:px-6">
+    <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-4 sm:px-6">
       <PageHeader
         title="Maintenance"
-        description="Announced work that may briefly affect a service. Windows and timestamps are shown in UTC; the page never hides an expired window."
+        description="Announced work that may briefly affect a service. Windows and timestamps are UTC."
         aside={
-          <div className="flex gap-6 fh-card border border-line bg-surface px-5 py-4">
-            <div>
-              <p className="font-sans text-[13px] text-muted">Upcoming</p>
-              <p className="mt-1 font-sans text-[22px] font-semibold leading-none tracking-[-0.04em]">
-                {openWindows.length}
-              </p>
-            </div>
-            <span className="w-px bg-line" aria-hidden="true" />
-            <div>
-              <p className="font-sans text-[13px] text-muted">Archive</p>
-              <p className="mt-1 font-sans text-[22px] font-semibold leading-none tracking-[-0.04em]">
-                {pastWindows.length}
-              </p>
-            </div>
-          </div>
+          <span className="fh-num">
+            {openWindows.length} upcoming · {pastWindows.length} archived
+          </span>
         }
       />
 
-      <section className="mt-9">
-        <h2 className="font-sans text-[13px] text-muted">Scheduled</h2>
+      <section className="mt-5">
+        <SectionHeading title="Scheduled" />
         {openWindows.length > 0 ? (
-          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+          <div className="overflow-hidden fh-panel border border-line bg-surface">
             {openWindows.map((window) => (
-              <MaintenanceCard key={window.id} window={window} affectedServices={names(window)} now={now} />
+              <MaintenanceRow key={window.id} window={window} affected={names(window)} now={now} />
             ))}
           </div>
         ) : (
-          <div className="mt-3 fh-card border border-line bg-surface px-5 py-4">
-            <p className="text-[16px] font-medium">No maintenance is scheduled.</p>
-            <p className="mt-0.5 text-[15px] text-muted">
-              When a window is announced it appears here with its UTC start and end.
-            </p>
-          </div>
+          <EmptyRow>
+            <span className="font-medium text-ink">No maintenance is scheduled.</span> Announced
+            windows appear here with their UTC start and end.
+          </EmptyRow>
         )}
       </section>
 
-      <section className="mt-12">
-        <h2 className="font-sans text-[13px] text-muted">Past windows</h2>
+      <section className="mt-6">
+        <SectionHeading title="Past windows" />
         {pastWindows.length > 0 ? (
-          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+          <div className="overflow-hidden fh-panel border border-line bg-surface">
             {pastWindows.map((window) => (
-              <div key={window.id}>
-                <MaintenanceCard window={window} affectedServices={names(window)} now={now} />
-                <p className="mt-1.5 px-1 font-sans text-[13px] text-muted">
-                  Recorded {formatDateTime(window.created_at)}
-                </p>
-              </div>
+              <MaintenanceRow key={window.id} window={window} affected={names(window)} now={now} />
             ))}
           </div>
         ) : (
-          <div className="mt-3 fh-card border border-dashed border-line bg-surface/50 px-5 py-8 text-center">
-            <p className="text-[16px] font-medium">No past maintenance windows.</p>
-            <p className="mt-1 text-[15px] text-muted">The archive starts when the first window is announced.</p>
-          </div>
+          <EmptyRow>
+            <span className="font-medium text-ink">No past maintenance windows.</span> The archive
+            starts when the first window is announced.
+          </EmptyRow>
         )}
       </section>
     </div>

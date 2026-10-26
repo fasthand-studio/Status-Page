@@ -5,7 +5,6 @@ import { AlertIcon } from '@/components/icons';
 import { PageHeader } from '@/components/page-header';
 import { ServicesExplorer, type ExplorerGroup } from '@/components/services-explorer';
 import { SetupNotice } from '@/components/setup-notice';
-import { StatusPill } from '@/components/status-pill';
 import { UptimeLegend } from '@/components/uptime-legend';
 import { getStatusSnapshot } from '@/lib/data';
 import {
@@ -27,9 +26,9 @@ export default async function ServicesPage() {
 
   if (snapshot.error) {
     return (
-      <div className="mx-auto max-w-[1180px] px-4 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1100px] px-4 pt-4 sm:px-6">
         <PageHeader title="Services" description="Health and measured uptime." />
-        <div className="mt-6">
+        <div className="mt-4">
           <DataError description={snapshot.error} />
         </div>
       </div>
@@ -38,12 +37,12 @@ export default async function ServicesPage() {
 
   if (!snapshot.configured) {
     return (
-      <div className="mx-auto max-w-[1180px] px-4 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1100px] px-4 pt-4 sm:px-6">
         <PageHeader
           title="Services"
           description="This directory fills in after the monitor database is connected. Nothing is shown as healthy without a check."
         />
-        <div className="mt-6">
+        <div className="mt-4">
           <SetupNotice />
         </div>
       </div>
@@ -104,53 +103,35 @@ export default async function ServicesPage() {
   const totalMonitored = groups.reduce((total, group) => total + group.monitoredCount, 0);
 
   return (
-    <div className="mx-auto max-w-[1180px] px-4 pb-8 pt-6 sm:px-6">
+    <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-4 sm:px-6">
       <PageHeader
         title="Services"
-        description="Search every FastHand service. Green is the most recent check passing — grey means no verified check exists, not that the service is down."
+        description="Every service, its latest check, and 90 days of measured uptime."
         aside={
-          <div className="flex items-center gap-5 fh-card border border-line bg-surface px-5 py-4">
-            <div>
-              <p className="font-sans text-[13px] text-muted">Coverage</p>
-              <p className="mt-1.5 font-sans text-[24px] font-semibold leading-none tracking-[-0.04em]">
-                {totalMonitored}
-                <span className="text-muted/50"> / {snapshot.services.length}</span>
-              </p>
-              <p className="mt-1 text-[13px] text-muted">services measured</p>
-            </div>
-            <span className="h-12 w-px bg-line" aria-hidden="true" />
-            <div className="space-y-2">
-              <StatusPill state={overall.state} size="sm" />
-              <p className="max-w-[150px] text-[13px] leading-snug text-muted">
-                {overall.staleCount > 0
-                  ? `${overall.staleCount} stale check${overall.staleCount === 1 ? '' : 's'}`
-                  : 'Freshness checked on load'}
-              </p>
-            </div>
-          </div>
+          <span className="fh-num">
+            {totalMonitored} / {snapshot.services.length} monitored
+            {overall.staleCount > 0 ? ` · ${overall.staleCount} stale` : ' · all fresh'}
+          </span>
         }
       />
 
-      <div className="mt-6">
+      <div className="mt-2 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+        <UptimeLegend />
         <CheckRunnerNote lastRun={snapshot.lastRun} now={now} />
       </div>
 
       {overall.staleCount > 0 && (
-        <div className="mt-3 flex items-start gap-2.5 fh-r-sm border border-warn/30 bg-warn-soft/60 px-4 py-3 text-[15px] text-ink/80">
-          <AlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-warn" />
+        <div className="mt-3 flex items-start gap-2 fh-r-sm border border-warn/30 bg-warn-soft/60 px-3 py-2 text-[12px] text-ink/80">
+          <AlertIcon className="mt-px h-3.5 w-3.5 shrink-0 text-warn" />
           <p>
-            {overall.staleCount} monitored service{overall.staleCount === 1 ? ' has' : 's have'} gone
-            past the expected check window. Those rows are marked <strong>Unknown</strong>; stale data
-            is not counted as uptime.
+            {overall.staleCount} monitored service{overall.staleCount === 1 ? ' has' : 's have'} missed
+            the expected check window and {overall.staleCount === 1 ? 'is' : 'are'} marked Unknown.
+            Stale data is never counted as uptime.
           </p>
         </div>
       )}
 
       <div className="mt-4">
-        <UptimeLegend />
-      </div>
-
-      <div className="mt-6">
         <ServicesExplorer
           groups={groups}
           totalServices={snapshot.services.length}
@@ -159,18 +140,10 @@ export default async function ServicesPage() {
         />
       </div>
 
-      <div className="mt-8 max-w-3xl space-y-2 text-[15px] leading-relaxed text-muted">
-        <p>
-          Uptime is successful checks divided by recorded checks in the window, bucketed by UTC day.
-          Windows are 7, 30, and 90 days; each bar is one UTC day. A service with no monitor has no
-          percentage.
-        </p>
-        <p>
-          A monitor is marked stale after three missed check intervals (or 15 minutes, whichever is
-          longer). Stale and missing days are excluded from percentages, and rows switch to Unknown —
-          never green.
-        </p>
-      </div>
+      <p className="mt-5 max-w-3xl text-[11.5px] leading-relaxed text-muted">
+        Uptime is successful checks divided by recorded checks per UTC day. Missing or stale days are
+        excluded; services without a monitor have no percentage.
+      </p>
     </div>
   );
 }

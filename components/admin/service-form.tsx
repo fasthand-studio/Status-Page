@@ -33,10 +33,10 @@ export function ServiceForm({
   }
 
   return (
-    <ActionForm action={action} className={`${adminCardClass} p-5 sm:p-6`}>
+    <ActionForm action={action} className={`${adminCardClass} px-3 py-2 sm:p-4`}>
       {service ? <input type="hidden" name="service_id" value={service.id} /> : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Name" htmlFor="name" required>
           <input
             id="name"
@@ -63,7 +63,7 @@ export function ServiceForm({
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Group" htmlFor="group_id" required>
           <select
             id="group_id"
@@ -111,7 +111,7 @@ export function ServiceForm({
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,160px)_1fr] sm:items-center">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,160px)_1fr] sm:items-center">
         <Field label="Sort order" htmlFor="sort_order" hint="Lower numbers appear first.">
           <input
             id="sort_order"
@@ -121,7 +121,7 @@ export function ServiceForm({
             className={adminInputClass}
           />
         </Field>
-        <label className="flex items-center gap-3 fh-r-sm border border-line bg-paper px-3 py-2.5 text-[17px] text-ink/85">
+        <label className="flex items-center gap-3 fh-r-sm border border-line bg-paper px-3 py-2 text-[11.5px] text-ink/85">
           <input
             type="checkbox"
             name="is_public"

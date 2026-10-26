@@ -66,45 +66,45 @@ export default async function AdminServicesPage({
         </EmptyAdminState>
       ) : (
         <div className={`${adminCardClass} overflow-x-auto`}>
-          <table className="w-full min-w-[820px] text-left text-[17px]">
+          <table className="w-full min-w-[820px] text-left text-[12.5px]">
             <thead>
-              <tr className="border-b border-line font-sans text-[13px] text-muted">
-                <th className="px-4 py-2.5 font-medium">Service</th>
-                <th className="px-4 py-2.5 font-medium">Group</th>
-                <th className="px-4 py-2.5 font-medium">Monitor</th>
-                <th className="px-4 py-2.5 font-medium">Health</th>
-                <th className="px-4 py-2.5 font-medium">Visible</th>
-                <th className="px-4 py-2.5 font-medium">Order</th>
-                <th className="px-4 py-2.5" />
+              <tr className="border-b border-line font-sans text-[11.5px] text-muted">
+                <th className="px-3 py-2 font-medium">Service</th>
+                <th className="px-3 py-2 font-medium">Group</th>
+                <th className="px-3 py-2 font-medium">Monitor</th>
+                <th className="px-3 py-2 font-medium">Health</th>
+                <th className="px-3 py-2 font-medium">Visible</th>
+                <th className="px-3 py-2 font-medium">Order</th>
+                <th className="px-3 py-2" />
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {data.services.map((service) => (
                 <tr key={service.id} className="transition hover:bg-ink/[0.03]">
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     <p className="font-medium text-ink/85">{service.name}</p>
-                    <p className="font-sans text-[13px] text-muted">{service.slug}</p>
+                    <p className="font-sans text-[11.5px] text-muted">{service.slug}</p>
                   </td>
-                  <td className="px-4 py-3 text-muted">{service.group_name}</td>
-                  <td className="px-4 py-3 text-muted">{service.monitor_name ?? '—'}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 text-muted">{service.group_name}</td>
+                  <td className="px-3 py-2 text-muted">{service.monitor_name ?? '—'}</td>
+                  <td className="px-3 py-2">
                     {service.monitor_id ? (
                       <MonitorState status={service.status} />
                     ) : (
-                      <span className="text-[15px] text-muted">No check</span>
+                      <span className="text-[12.5px] text-muted">No check</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     <span
-                      className={`font-sans text-[13px] ${
+                      className={`font-sans text-[11.5px] ${
                         service.is_public ? 'text-ok' : 'text-muted'
                       }`}
                     >
                       {service.is_public ? 'Public' : 'Hidden'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-sans text-[15px] text-muted">{service.sort_order}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 font-sans text-[12.5px] text-muted">{service.sort_order}</td>
+                  <td className="px-3 py-2">
                     <div className="flex flex-wrap items-center justify-end gap-3">
                       <Link href={`/admin/services/${service.id}`} className={linkClass}>
                         Edit

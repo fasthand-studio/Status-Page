@@ -68,7 +68,7 @@ export default async function AdminIncidentPage({
     <div className="space-y-6">
       <Link
         href="/admin/incidents"
-        className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink"
       >
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All incidents
@@ -86,7 +86,7 @@ export default async function AdminIncidentPage({
           <span className="flex flex-wrap items-center gap-2">
             <AdminStatusBadge status={incident.status} />
             <AdminImpactBadge impact={incident.impact} />
-            <span className="text-[15px] text-muted">
+            <span className="text-[12.5px] text-muted">
               Started {formatDateTime(incident.started_at)}
               {incident.resolved_at ? ` · Resolved ${formatDateTime(incident.resolved_at)}` : ''}
             </span>
@@ -96,7 +96,7 @@ export default async function AdminIncidentPage({
           <Link
             href={`/incidents/${incident.id}`}
             target="_blank"
-            className="inline-flex items-center gap-1.5 fh-round border border-line px-3 py-1.5 text-[15px] text-ink/85 transition hover:border-ink/25 hover:bg-ink/5"
+            className="inline-flex items-center gap-1.5 fh-round border border-line px-3 py-1.5 text-[12.5px] text-ink/85 transition hover:border-ink/25 hover:bg-ink/5"
           >
             Public page
             <ArrowUpRightIcon className="h-3.5 w-3.5" />
@@ -111,11 +111,11 @@ export default async function AdminIncidentPage({
         </Notice>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.4fr_0.85fr]">
+      <div className="grid gap-3 xl:grid-cols-[1.4fr_0.85fr]">
         <div className="space-y-6">
-          <section className={`${adminCardClass} p-5`}>
-            <h2 className="font-sans text-[18px] font-semibold">Post an update</h2>
-            <p className="mt-1 text-[15px] leading-relaxed text-muted">
+          <section className={`${adminCardClass} px-3 py-2`}>
+            <h2 className="font-sans text-[13.5px] font-semibold">Post an update</h2>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
               Updates are public immediately. The status you choose here also changes the incident state; choosing
               Resolved sets the resolution time.
             </p>
@@ -124,7 +124,7 @@ export default async function AdminIncidentPage({
               <ActionForm action={postIncidentUpdateAction}>
                 <input type="hidden" name="incident_id" value={incident.id} />
 
-                <div className="grid gap-4 sm:grid-cols-[minmax(0,220px)_1fr] sm:items-start">
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,220px)_1fr] sm:items-start">
                   <Field label="New status" htmlFor="update_status" required>
                     <select
                       id="update_status"
@@ -153,7 +153,7 @@ export default async function AdminIncidentPage({
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                  <p className="text-[15px] text-muted">
+                  <p className="text-[12.5px] text-muted">
                     Choosing a non-resolved status on a resolved incident reopens it.
                   </p>
                   <SubmitButton pendingLabel="Publishing…">Publish update</SubmitButton>
@@ -163,21 +163,21 @@ export default async function AdminIncidentPage({
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-sans text-[18px] font-semibold">Timeline</h2>
+            <h2 className="font-sans text-[13.5px] font-semibold">Timeline</h2>
             {incident.incident_updates.length === 0 ? (
               <Notice tone="warn">This incident has no updates. Add one so the public page has something to show.</Notice>
             ) : (
               <ol className="space-y-3">
                 {incident.incident_updates.map((update) => (
-                  <li key={update.id} className={`${adminCardClass} p-4`}>
+                  <li key={update.id} className={`${adminCardClass} px-3 py-2`}>
                     <div className="flex flex-wrap items-center gap-2">
                       <AdminStatusBadge status={update.status} />
-                      <span className="font-sans text-[13px] text-muted">
+                      <span className="font-sans text-[11.5px] text-muted">
                         {update.author}
                       </span>
-                      <span className="text-[15px] text-muted">{formatDateTime(update.created_at)}</span>
+                      <span className="text-[12.5px] text-muted">{formatDateTime(update.created_at)}</span>
                     </div>
-                    <Markdown invert className="mt-3">
+                    <Markdown invert className="mt-2">
                       {update.body}
                     </Markdown>
                   </li>
@@ -188,8 +188,8 @@ export default async function AdminIncidentPage({
         </div>
 
         <aside className="space-y-6">
-          <section className={`${adminCardClass} p-5`}>
-            <h2 className="font-sans text-[18px] font-semibold">Details</h2>
+          <section className={`${adminCardClass} px-3 py-2`}>
+            <h2 className="font-sans text-[13.5px] font-semibold">Details</h2>
             <div className="mt-4">
               <ActionForm action={updateIncidentAction}>
                 <input type="hidden" name="incident_id" value={incident.id} />
@@ -244,9 +244,9 @@ export default async function AdminIncidentPage({
             </div>
           </section>
 
-          <section className={`${adminCardClass} p-5`}>
-            <h2 className="font-sans text-[18px] font-semibold">Record</h2>
-            <dl className="mt-3 space-y-2 text-[15px]">
+          <section className={`${adminCardClass} px-3 py-2`}>
+            <h2 className="font-sans text-[13.5px] font-semibold">Record</h2>
+            <dl className="mt-2 space-y-2 text-[12.5px]">
               <div className="flex justify-between gap-3">
                 <dt className="text-muted">Created</dt>
                 <dd className="text-right text-muted">{formatDateTime(incident.created_at)}</dd>
@@ -263,7 +263,7 @@ export default async function AdminIncidentPage({
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-muted">Incident ID</dt>
-                <dd className="truncate font-sans text-[13px] text-muted">{incident.id}</dd>
+                <dd className="truncate font-sans text-[11.5px] text-muted">{incident.id}</dd>
               </div>
               {incident.monitor_id ? (
                 <div className="flex justify-between gap-3">

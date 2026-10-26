@@ -26,10 +26,10 @@ export function AdminNav() {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'fh-pill-lg shrink-0 justify-start px-3 transition-colors',
+              'shrink-0 fh-r-sm px-2.5 py-1.5 text-[13px] transition-colors',
               active
-                ? 'bg-primary font-semibold text-white'
-                : 'font-medium text-muted hover:bg-ink/5 hover:text-ink',
+                ? 'bg-primary/[0.07] font-medium text-primary'
+                : 'text-muted hover:bg-surface-soft hover:text-ink',
             )}
           >
             {item.label}

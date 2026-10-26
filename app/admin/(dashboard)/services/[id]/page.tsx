@@ -48,7 +48,7 @@ export default async function AdminServicePage({
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <Link href="/admin/services" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
+      <Link href="/admin/services" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All services
       </Link>
@@ -60,19 +60,19 @@ export default async function AdminServicePage({
         title={service.name}
         description={
           <span className="flex flex-wrap items-center gap-2">
-            <span className="font-sans text-[15px] text-muted">/{service.slug}</span>
+            <span className="font-sans text-[12.5px] text-muted">/{service.slug}</span>
             <span className="text-ink/20">·</span>
-            {service.monitor_id ? <MonitorState status={status} /> : <span className="text-[15px] text-muted">No check</span>}
+            {service.monitor_id ? <MonitorState status={status} /> : <span className="text-[12.5px] text-muted">No check</span>}
           </span>
         }
         actions={
-          <Link href="/services" target="_blank" className={`${linkClass} text-[15px]`}>
+          <Link href="/services" target="_blank" className={`${linkClass} text-[12.5px]`}>
             Public directory
           </Link>
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.5fr_0.7fr]">
+      <div className="grid gap-3 xl:grid-cols-[1.5fr_0.7fr]">
         <ServiceForm
           action={updateServiceAction}
           service={service}
@@ -82,10 +82,10 @@ export default async function AdminServicePage({
         />
 
         <aside className="space-y-3">
-          <div className={`${adminCardClass} p-4`}>
-            <p className="font-sans text-[13px] text-muted">Health evidence</p>
+          <div className={`${adminCardClass} px-3 py-2`}>
+            <p className="font-sans text-[11.5px] text-muted">Health evidence</p>
             {service.monitor_id && status ? (
-              <div className="mt-3 space-y-2 text-[15px]">
+              <div className="mt-2 space-y-2 text-[12.5px]">
                 <MonitorState status={status} />
                 <p className="text-muted">
                   Last check {formatRelativeTime(status.checked_at)}
@@ -96,15 +96,15 @@ export default async function AdminServicePage({
                 </Link>
               </div>
             ) : (
-              <p className="mt-3 text-[15px] leading-relaxed text-muted">
+              <p className="mt-2 text-[12.5px] leading-relaxed text-muted">
                 No monitor is attached. The public row says “No check” and contributes no uptime history.
               </p>
             )}
           </div>
 
-          <div className={`${adminCardClass} p-4`}>
-            <p className="font-sans text-[13px] text-muted">Notes</p>
-            <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-muted">
+          <div className={`${adminCardClass} px-3 py-2`}>
+            <p className="font-sans text-[11.5px] text-muted">Notes</p>
+            <ul className="mt-2 space-y-2 text-[12.5px] leading-relaxed text-muted">
               <li>Hiding a service removes it from the public page but keeps its history.</li>
               <li>Unattaching a monitor does not delete stored results.</li>
               <li>Uptime is computed from check history, never typed in.</li>

@@ -19,8 +19,8 @@ export function AutoRefresh({ seconds = 60 }: { seconds?: number }) {
   }, [router, seconds]);
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-[15px] text-muted">
-      <span className="h-1.5 w-1.5 fh-round bg-primary-deep" aria-hidden="true" />
+    <span className="inline-flex items-center gap-1.5 text-[12px] text-muted">
+      <span className="h-1.5 w-1.5 fh-round bg-primary" aria-hidden="true" />
       Auto-refresh · {seconds}s
     </span>
   );

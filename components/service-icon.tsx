@@ -20,5 +20,5 @@ const ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
 
 export function ServiceIcon({ slug, className }: { slug: string; className?: string }) {
   const Icon = ICONS[slug] ?? ActivityIcon;
-  return <Icon className={className ?? 'h-5 w-5 shrink-0 text-ink/70'} />;
+  return <Icon className={className ?? 'h-4 w-4 shrink-0 text-muted'} />;
 }

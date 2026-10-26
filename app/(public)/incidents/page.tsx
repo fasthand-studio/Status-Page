@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { DataError } from '@/components/data-error';
 import { IncidentCard } from '@/components/incident-card';
+import { IncidentRow } from '@/components/incident-row';
 import { PageHeader } from '@/components/page-header';
+import { SectionHeading } from '@/components/section-heading';
 import { SetupNotice } from '@/components/setup-notice';
 import { getStatusSnapshot } from '@/lib/data';
-import { formatRelativeTime } from '@/lib/format';
+import { formatMonthLabel, formatRelativeTime } from '@/lib/format';
 import type { IncidentWithRelations } from '@/lib/types';
 
 export const metadata: Metadata = {
@@ -20,9 +22,9 @@ export default async function IncidentsPage() {
 
   if (snapshot.error) {
     return (
-      <div className="mx-auto max-w-[1180px] px-4 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1100px] px-4 pt-4 sm:px-6">
         <PageHeader title="Incidents" description="Active and recently resolved incidents." />
-        <div className="mt-6">
+        <div className="mt-4">
           <DataError description={snapshot.error} />
         </div>
       </div>
@@ -31,12 +33,12 @@ export default async function IncidentsPage() {
 
   if (!snapshot.configured) {
     return (
-      <div className="mx-auto max-w-[1180px] px-4 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1100px] px-4 pt-4 sm:px-6">
         <PageHeader
           title="Incidents"
           description="Incident history starts after the monitoring database is connected."
         />
-        <div className="mt-6">
+        <div className="mt-4">
           <SetupNotice />
         </div>
       </div>
@@ -54,62 +56,72 @@ export default async function IncidentsPage() {
   );
   const resolved = snapshot.recentIncidents;
 
+  const resolvedByMonth = new Map<string, IncidentWithRelations[]>();
+  for (const incident of resolved) {
+    const key = formatMonthLabel(incident.resolved_at ?? incident.started_at);
+    const bucket = resolvedByMonth.get(key) ?? [];
+    bucket.push(incident);
+    resolvedByMonth.set(key, bucket);
+  }
+
   return (
-    <div className="mx-auto max-w-[1180px] px-4 pb-8 pt-6 sm:px-6">
+    <div className="mx-auto max-w-[1100px] px-4 pb-8 pt-4 sm:px-6">
       <PageHeader
         title="Incidents"
-        description="Every incident is a public record: what changed, when we noticed, and what we did. Automated discoveries are labelled."
+        description="Every incident is a public record: what changed, when we noticed, and what we did."
         aside={
-          <div className="flex gap-6 fh-card border border-line bg-surface px-5 py-4">
-            <div>
-              <p className="font-sans text-[13px] text-muted">Open</p>
-              <p className="mt-1 font-sans text-[22px] font-semibold leading-none tracking-[-0.04em]">
-                {active.length}
-              </p>
-            </div>
-            <span className="w-px bg-line" aria-hidden="true" />
-            <div>
-              <p className="font-sans text-[13px] text-muted">Recent</p>
-              <p className="mt-1 font-sans text-[22px] font-semibold leading-none tracking-[-0.04em]">
-                {resolved.length}
-              </p>
-            </div>
-          </div>
+          <span className="fh-num">
+            {active.length} open · {resolved.length} resolved
+          </span>
         }
       />
 
-      <section className="mt-9">
-        <h2 className="font-sans text-[13px] text-muted">Active</h2>
+      <section className="mt-5">
+        <SectionHeading title="Active" />
         {active.length > 0 ? (
-          <div className="mt-3 grid gap-4">
+          <div className="grid gap-2">
             {active.map((incident) => (
               <IncidentCard key={incident.id} incident={incident} affectedServices={affected(incident)} now={now} />
             ))}
           </div>
         ) : (
-          <div className="mt-3 fh-card border border-line bg-surface px-5 py-4">
-            <p className="text-[16px] font-medium">No active incidents.</p>
-            <p className="mt-0.5 text-[15px] text-muted">
+          <div className="fh-card border border-line bg-surface px-3.5 py-2.5">
+            <p className="text-[12.5px] text-muted">
+              <span className="font-medium text-ink">No active incidents.</span>{' '}
               {resolved[0]
                 ? `The last incident was resolved ${formatRelativeTime(resolved[0].resolved_at, now)}.`
-                : 'No incident has been recorded on this status page yet.'}
+                : 'No incident has been recorded yet.'}
             </p>
           </div>
         )}
       </section>
 
-      <section className="mt-12">
-        <h2 className="font-sans text-[13px] text-muted">Recently resolved</h2>
+      <section className="mt-6">
+        <SectionHeading title="Resolved" />
         {resolved.length > 0 ? (
-          <div className="mt-3 grid gap-4 lg:grid-cols-2">
-            {resolved.map((incident) => (
-              <IncidentCard key={incident.id} incident={incident} affectedServices={affected(incident)} now={now} />
+          <div className="space-y-3">
+            {[...resolvedByMonth.entries()].map(([month, incidents]) => (
+              <div key={month}>
+                <h3 className="mb-1 px-1 text-[11.5px] font-semibold uppercase tracking-[0.05em] text-muted">
+                  {month}
+                </h3>
+                <div className="overflow-hidden fh-panel border border-line bg-surface">
+                  {incidents.map((incident) => (
+                    <IncidentRow
+                      key={incident.id}
+                      incident={incident}
+                      affectedServices={affected(incident)}
+                      now={now}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="mt-3 fh-card border border-dashed border-line bg-surface/50 px-5 py-8 text-center">
-            <p className="text-[16px] font-medium">Nothing resolved yet.</p>
-            <p className="mt-1 text-[15px] text-muted">
+          <div className="fh-card border border-dashed border-line bg-surface-soft px-4 py-6 text-center">
+            <p className="text-[13px] font-medium">Nothing resolved yet.</p>
+            <p className="mt-0.5 text-[12px] text-muted">
               The archive starts when this page begins recording incidents.
             </p>
           </div>

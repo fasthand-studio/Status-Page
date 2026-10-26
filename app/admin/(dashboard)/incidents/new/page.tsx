@@ -45,7 +45,7 @@ export default async function NewIncidentPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/admin/incidents" className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
+      <Link href="/admin/incidents" className="inline-flex items-center gap-1.5 text-[12.5px] text-muted hover:text-ink">
         <ArrowLeftIcon className="h-3.5 w-3.5" />
         All incidents
       </Link>
@@ -60,12 +60,12 @@ export default async function NewIncidentPage() {
         incidents after sustained failures; you do not need to duplicate them.
       </Notice>
 
-      <ActionForm action={createIncidentAction} className={`${adminCardClass} p-5 sm:p-6`}>
+      <ActionForm action={createIncidentAction} className={`${adminCardClass} px-3 py-2 sm:p-4`}>
         <Field label="Title" htmlFor="title" required hint="Short and factual, e.g. “Seller panel login is slow”.">
           <input id="title" name="title" required maxLength={140} className={adminInputClass} />
         </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Impact" htmlFor="impact" required hint="Drives the public severity label.">
             <select id="impact" name="impact" defaultValue="major" className={adminSelectClass}>
               {INCIDENT_IMPACTS.map((impact) => (
@@ -113,7 +113,7 @@ export default async function NewIncidentPage() {
         />
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <p className="text-[15px] text-muted">
+          <p className="text-[12.5px] text-muted">
             Resolved incidents still appear under{' '}
             <Link href="/history" className={linkClass}>
               history

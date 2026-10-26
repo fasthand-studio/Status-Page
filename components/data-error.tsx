@@ -9,12 +9,12 @@ export function DataError({
   description?: string;
 }) {
   return (
-    <div className="flex flex-col items-start gap-4 fh-panel border border-bad/25 bg-bad-soft/60 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <AlertIcon className="mt-0.5 h-5 w-5 shrink-0 text-bad" />
+    <div className="flex flex-col items-start gap-3 fh-card border border-bad/25 bg-bad-soft/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-2.5">
+        <AlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-bad" />
         <div>
-          <p className="text-[18px] font-semibold tracking-[-0.02em]">{title}</p>
-          <p className="mt-1 max-w-xl text-[15px] leading-relaxed text-ink/70">
+          <p className="text-[14px] font-semibold">{title}</p>
+          <p className="mt-0.5 max-w-xl text-[12px] leading-relaxed text-ink/70">
             {description ??
               'The monitoring database did not answer. Nothing is being assumed healthy while data is missing.'}
           </p>

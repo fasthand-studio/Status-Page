@@ -17,18 +17,18 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="admin-shell min-h-screen bg-paper text-ink">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col lg:flex-row">
-        <aside className="flex shrink-0 flex-col gap-5 border-b border-line px-4 py-4 lg:w-56 lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col lg:flex-row">
+        <aside className="flex shrink-0 flex-col gap-3 border-b border-line px-3 py-3 lg:w-52 lg:border-b-0 lg:border-r lg:px-4 lg:py-5">
           <Brand label="Ops" className="text-ink" />
 
           <AdminNav />
 
-          <div className="mt-auto hidden space-y-3 lg:block">
-            <div className="fh-r-sm border border-line bg-surface p-3">
-              <p className="text-[13px] text-muted">Signed in</p>
-              <p className="mt-0.5 truncate text-[15px]">{context.email}</p>
+          <div className="mt-auto hidden space-y-2.5 lg:block">
+            <div className="fh-r-sm border border-line bg-surface px-2.5 py-2">
+              <p className="text-[11px] text-muted">Signed in</p>
+              <p className="mt-0.5 truncate text-[12.5px]">{context.email}</p>
             </div>
-            <p className="px-1 text-[15px] leading-relaxed text-muted">
+            <p className="px-1 text-[11.5px] leading-relaxed text-muted">
               Public numbers come from stored checks. Never publish an uptime figure you cannot point to
               in check_results.
             </p>
@@ -36,23 +36,23 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-2.5 lg:px-8">
-            <p className="text-[15px] text-muted">FastHand ops desk</p>
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2 lg:px-6">
+            <p className="text-[12.5px] text-muted">FastHand ops desk</p>
             <div className="flex items-center gap-2">
               <Link href="/" target="_blank" className={secondaryButtonClass}>
                 Public page
-                <ArrowUpRightIcon className="h-4 w-4" />
+                <ArrowUpRightIcon className="h-3.5 w-3.5" />
               </Link>
               <form action={signOutAction}>
                 <button type="submit" className={secondaryButtonClass}>
-                  <LogOutIcon className="h-4 w-4" />
+                  <LogOutIcon className="h-3.5 w-3.5" />
                   Sign out
                 </button>
               </form>
             </div>
           </header>
 
-          <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
+          <main className="flex-1 px-3 py-4 lg:px-6 lg:py-5">{children}</main>
         </div>
       </div>
     </div>

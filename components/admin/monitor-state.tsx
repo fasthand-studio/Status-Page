@@ -25,7 +25,7 @@ export function MonitorState({ status, className }: { status: MonitorStatus | nu
   const key = monitorStateKey(status);
   const copy = COPY[key];
   return (
-    <span className={cn('inline-flex items-center gap-1.5 text-[15px] font-medium', copy.text, className)}>
+    <span className={cn('inline-flex items-center gap-1.5 text-[12.5px] font-medium', copy.text, className)}>
       <span className={cn('h-1.5 w-1.5 shrink-0 fh-round', copy.dot)} aria-hidden="true" />
       {copy.label}
     </span>
