@@ -195,7 +195,7 @@ export function ServicesExplorer({
             ? `${matchCount} match${matchCount === 1 ? '' : 'es'} for “${query.trim()}”`
             : `${totalServices} services · ${totalMonitored} with automated checks`}
         </span>
-        <span className="hidden sm:inline">Each bar is one UTC day, oldest on the left</span>
+        <span className="hidden sm:inline">Each bar is one UTC day · click an incident bar to open it</span>
       </div>
 
       {filteredGroups.length === 0 ? (

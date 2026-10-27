@@ -27,6 +27,7 @@ function emptySnapshot(configured: boolean): StatusSnapshot {
     dailyStats: [],
     openIncidents: [],
     recentIncidents: [],
+    windowIncidents: [],
     maintenance: [],
     lastRun: null,
   };
@@ -49,7 +50,7 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
 
   const since = dayKey(daysAgo(89));
 
-  const [groupsResult, servicesResult, anonMonitorsResult, dailyResult, openResult, recentResult, maintenanceResult, runResult] =
+  const [groupsResult, servicesResult, anonMonitorsResult, dailyResult, openResult, recentResult, windowResult, maintenanceResult, runResult] =
     await Promise.all([
       client.from('service_groups').select('*').order('sort_order', { ascending: true }),
       client.from('services').select('*').eq('is_public', true).order('sort_order', { ascending: true }),
@@ -66,6 +67,14 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
         .not('resolved_at', 'is', null)
         .order('resolved_at', { ascending: false })
         .limit(12),
+      // Bar markers need every incident inside the 90-day window, not just the 12
+      // most recent resolved ones shown in the lists.
+      client
+        .from('incidents')
+        .select(INCIDENT_SELECT)
+        .lte('started_at', new Date().toISOString())
+        .or(`resolved_at.is.null,resolved_at.gte.${since}`)
+        .order('started_at', { ascending: false }),
       client
         .from('maintenance_windows')
         .select('*, maintenance_services(service_id)')
@@ -89,6 +98,7 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
     dailyResult.error ||
     openResult.error ||
     recentResult.error ||
+    windowResult.error ||
     maintenanceResult.error ||
     runResult.error;
 
@@ -109,6 +119,7 @@ export async function getStatusSnapshot(): Promise<StatusSnapshot> {
     dailyStats: (dailyResult.data ?? []) as DailyStat[],
     openIncidents: (openResult.data ?? []).map(normalizeIncident),
     recentIncidents: (recentResult.data ?? []).map(normalizeIncident),
+    windowIncidents: (windowResult.data ?? []).map(normalizeIncident),
     maintenance: (maintenanceResult.data ?? []) as MaintenanceWithServices[],
     lastRun: (runResult.data as MonitorRun | null) ?? null,
   };

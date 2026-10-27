@@ -1,5 +1,6 @@
 import { dayKey, daysAgo, formatRelativeTime } from './format';
 import type {
+  BarIncident,
   DailyBar,
   DailyStat,
   HealthState,
@@ -352,9 +353,53 @@ export function summarizeUptime(
   return { checks, okChecks, percent: checks > 0 ? (okChecks / checks) * 100 : null };
 }
 
+export type BarTone = 'ok' | 'ok-soft' | 'warn' | 'bad' | 'empty';
+
+/**
+ * Days covered by an incident are tinted by its impact even when the automated
+ * checks passed, because the incident is the published truth for that day.
+ */
+const INCIDENT_TONE: Record<IncidentImpact, BarTone | null> = {
+  critical: 'bad',
+  major: 'bad',
+  minor: 'warn',
+  none: null,
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function toBarIncident(incident: IncidentWithRelations): BarIncident {
+  return {
+    id: incident.id,
+    title: incident.title,
+    status: incident.status,
+    impact: incident.impact,
+    ongoing: incident.resolved_at === null,
+  };
+}
+
+const TONE_RANK: Record<BarTone, number> = {
+  empty: 0,
+  ok: 1,
+  'ok-soft': 1,
+  warn: 2,
+  bad: 3,
+};
+
+export function incidentTone(incidents: BarIncident[]): BarTone | null {
+  let worst: BarTone | null = null;
+  for (const incident of incidents) {
+    const tone = INCIDENT_TONE[incident.impact];
+    if (!tone) continue;
+    if (!worst || TONE_RANK[tone] > TONE_RANK[worst]) worst = tone;
+  }
+  return worst;
+}
+
 export function buildDailyBars(
   dailyStats: DailyStat[],
   serviceId: string,
+  incidents: IncidentWithRelations[],
   now: Date = new Date(),
   days = 90,
 ): DailyBar[] {
@@ -363,6 +408,20 @@ export function buildDailyBars(
       .filter((stat) => stat.service_id === serviceId)
       .map((stat) => [stat.day, stat] as const),
   );
+  const windows = incidents
+    .filter((incident) => incidentAffectsService(incident, serviceId))
+    .map((incident) => ({
+      bar: toBarIncident(incident),
+      start: new Date(incident.started_at).getTime(),
+      end: (incident.resolved_at ? new Date(incident.resolved_at) : now).getTime(),
+    }))
+    .filter((window) => Number.isFinite(window.start) && Number.isFinite(window.end))
+    .sort(
+      (a, b) =>
+        IMPACT_RANK[b.bar.impact] - IMPACT_RANK[a.bar.impact] ||
+        Number(b.bar.ongoing) - Number(a.bar.ongoing) ||
+        b.start - a.start,
+    );
   const start = daysAgo(days - 1, now);
   const bars: DailyBar[] = [];
 
@@ -370,19 +429,28 @@ export function buildDailyBars(
     const date = new Date(start);
     date.setUTCDate(date.getUTCDate() + index);
     const day = dayKey(date);
+    const dayStart = date.getTime();
+    const dayEnd = dayStart + DAY_MS - 1;
     const stat = byDay.get(day);
     bars.push({
       day,
       checks: stat?.checks ?? 0,
       okChecks: stat?.ok_checks ?? 0,
       percent: stat && stat.checks > 0 ? (stat.ok_checks / stat.checks) * 100 : null,
+      incidents: windows
+        .filter((window) => window.start <= dayEnd && window.end >= dayStart)
+        .map((window) => window.bar),
     });
   }
 
   return bars;
 }
 
-export function barTone(bar: DailyBar): 'ok' | 'ok-soft' | 'warn' | 'bad' | 'empty' {
+export function barTone(bar: DailyBar): BarTone {
+  return incidentTone(bar.incidents) ?? statTone(bar);
+}
+
+function statTone(bar: DailyBar): BarTone {
   if (bar.percent === null) return 'empty';
   if (bar.percent >= 99.9) return 'ok';
   if (bar.percent >= 99) return 'ok-soft';

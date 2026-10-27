@@ -70,6 +70,7 @@ function aggregateBars(dailyStats: DailyStat[], now: Date): DailyBar[] {
       checks: row?.checks ?? 0,
       okChecks: row?.okChecks ?? 0,
       percent: row && row.checks > 0 ? (row.okChecks / row.checks) * 100 : null,
+      incidents: [],
     });
   }
 

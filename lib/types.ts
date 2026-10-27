@@ -138,6 +138,8 @@ export interface StatusSnapshot {
   dailyStats: DailyStat[];
   openIncidents: IncidentWithRelations[];
   recentIncidents: IncidentWithRelations[];
+  /** Every incident overlapping the 90-day stats window, including old resolved ones. */
+  windowIncidents: IncidentWithRelations[];
   maintenance: MaintenanceWithServices[];
   lastRun: MonitorRun | null;
 }
@@ -148,9 +150,19 @@ export interface UptimeWindow {
   percent: number | null;
 }
 
+/** A light projection of an incident onto one UTC day of the uptime bars. */
+export interface BarIncident {
+  id: string;
+  title: string;
+  status: IncidentStatus;
+  impact: IncidentImpact;
+  ongoing: boolean;
+}
+
 export interface DailyBar {
   day: string;
   checks: number;
   okChecks: number;
   percent: number | null;
+  incidents: BarIncident[];
 }

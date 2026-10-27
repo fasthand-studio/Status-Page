@@ -100,7 +100,7 @@ export default async function ServicesPage() {
             uptime7: summarizeUptime(snapshot.dailyStats, service.id, 7, now),
             uptime30: summarizeUptime(snapshot.dailyStats, service.id, 30, now),
             uptime90: summarizeUptime(snapshot.dailyStats, service.id, 90, now),
-            bars: buildDailyBars(snapshot.dailyStats, service.id, now, 90),
+            bars: buildDailyBars(snapshot.dailyStats, service.id, snapshot.windowIncidents, now, 90),
             lastCheckAt: monitor?.checked_at ?? null,
             monitored: Boolean(monitor?.enabled && service.monitor_id),
           };

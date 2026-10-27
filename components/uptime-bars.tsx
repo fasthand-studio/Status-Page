@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { formatDayLabel, formatUptime } from '@/lib/format';
-import { barTone } from '@/lib/status';
-import type { DailyBar } from '@/lib/types';
+import { IMPACT_LABEL, barTone, type BarTone } from '@/lib/status';
+import type { BarIncident, DailyBar } from '@/lib/types';
 
 const TONE_CLASS = {
   ok: 'bg-ok',
@@ -23,7 +24,10 @@ const TONE_TEXT = {
   empty: 'text-muted',
 } as const;
 
+const MAX_INCIDENT_ROWS = 3;
+
 export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string }) {
+  const router = useRouter();
   const [hovered, setHovered] = useState<number | null>(null);
   const totalChecks = bars.reduce((total, bar) => total + bar.checks, 0);
   const okChecks = bars.reduce((total, bar) => total + bar.okChecks, 0);
@@ -31,12 +35,20 @@ export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string })
   const active = hovered !== null ? bars[hovered] : null;
   const left = hovered !== null ? Math.min(Math.max((hovered / Math.max(1, bars.length - 1)) * 100, 10), 90) : 0;
 
+  const openIncident = (incident: BarIncident) => (event: React.MouseEvent) => {
+    event.stopPropagation();
+    router.push(`/incidents/${incident.id}`);
+  };
+
   return (
     <div className="w-full">
       <div className="relative" onMouseLeave={() => setHovered(null)}>
         {active && (
           <div
-            className="pointer-events-none absolute -top-10 z-20 -translate-x-1/2 whitespace-nowrap fh-r-sm border border-line bg-surface px-2 py-1 text-[14px] leading-tight text-ink"
+            className={cn(
+              'absolute bottom-full mb-1.5 z-20 -translate-x-1/2 whitespace-nowrap fh-r-sm border border-line bg-surface px-2 py-1 text-[14px] leading-tight text-ink',
+              active.incidents.length > 0 ? 'pointer-events-auto' : 'pointer-events-none',
+            )}
             style={{ left: `${left}%` }}
             role="status"
           >
@@ -45,25 +57,66 @@ export function UptimeBars({ bars, label }: { bars: DailyBar[]; label: string })
               {TONE_WORD[barTone(active)]}
               {active.percent !== null && ` · ${formatUptime(active.percent)} uptime`}
             </span>
+            {active.incidents.length > 0 && (
+              <span className="mt-1 block border-t border-line pt-1">
+                {active.incidents.slice(0, MAX_INCIDENT_ROWS).map((incident) => (
+                  <button
+                    type="button"
+                    key={incident.id}
+                    onClick={openIncident(incident)}
+                    className="block max-w-full cursor-pointer truncate text-left font-medium text-primary hover:underline"
+                  >
+                    {incident.title}
+                    <span className="text-muted">
+                      {' '}
+                      · {IMPACT_LABEL[incident.impact]} · {incident.ongoing ? 'Ongoing' : 'Resolved'}
+                    </span>
+                  </button>
+                ))}
+                {active.incidents.length > MAX_INCIDENT_ROWS && (
+                  <span className="block text-muted">
+                    +{active.incidents.length - MAX_INCIDENT_ROWS} more incident
+                    {active.incidents.length - MAX_INCIDENT_ROWS === 1 ? '' : 's'}
+                  </span>
+                )}
+              </span>
+            )}
           </div>
         )}
 
         <div
-          role="img"
+          role="group"
           aria-label={`${label}: ${formatUptime(percent)} uptime across ${bars.length} UTC days`}
           className="fh-bars"
         >
-          {bars.map((bar, index) => (
-            <div
-              key={bar.day}
-              onMouseEnter={() => setHovered(index)}
-              onClick={() => setHovered(index)}
-              className={cn(
-                'min-w-0 flex-1 fh-bar transition-opacity hover:opacity-70',
-                TONE_CLASS[barTone(bar)],
-              )}
-            />
-          ))}
+          {bars.map((bar, index) => {
+            const tone: BarTone = barTone(bar);
+            const shared = cn('min-w-0 flex-1 fh-bar transition-opacity hover:opacity-70', TONE_CLASS[tone]);
+
+            if (bar.incidents.length === 0) {
+              return (
+                <div
+                  key={bar.day}
+                  onMouseEnter={() => setHovered(index)}
+                  onClick={() => setHovered(index)}
+                  className={shared}
+                />
+              );
+            }
+
+            const primary = bar.incidents[0];
+            return (
+              <button
+                key={bar.day}
+                type="button"
+                onMouseEnter={() => setHovered(index)}
+                onFocus={() => setHovered(index)}
+                onClick={openIncident(primary)}
+                aria-label={`${formatDayLabel(bar.day)}: ${primary.title}. Open incident details.`}
+                className={cn(shared, 'cursor-pointer appearance-none border-0 p-0 text-left')}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
